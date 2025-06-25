@@ -12,12 +12,12 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10_000,
-  withCredentials: true,
   params: {
     api_key: Config.API_KEY,
     language: "en-US",
-  }
+  },
+  timeout: 10_000,
+  withCredentials: true,
 });
 
 let isRefreshing = false;
