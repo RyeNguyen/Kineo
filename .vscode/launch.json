@@ -1,0 +1,81 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "iOS Debug Develop",
+        "request": "launch",
+        "type": "reactnative",
+        "cwd": "${workspaceFolder}",
+        "platform": "ios",
+        "runArguments": [
+          "--scheme",
+          "ReactNativeTemplateDebugDev",
+          "--mode",
+          "DebugDev"
+        ]
+      },
+      {
+        "name": "iOS Debug Staging",
+        "request": "launch",
+        "type": "reactnative",
+        "cwd": "${workspaceFolder}",
+        "platform": "ios",
+        "runArguments": [
+          "--scheme",
+          "ReactNativeTemplateDebugStaging",
+          "--mode",
+          "DebugStaging"
+        ]
+      },
+      {
+        "name": "iOS Debug Production",
+        "request": "launch",
+        "type": "reactnative",
+        "cwd": "${workspaceFolder}",
+        "platform": "ios",
+        "runArguments": [
+          "--scheme",
+          "ReactNativeTemplateDebugProd",
+          "--mode",
+          "DebugProd"
+        ]
+      },
+      {
+        "name": "Android Debug Develop",
+        "request": "launch",
+        "type": "reactnative",
+        "cwd": "${workspaceFolder}",
+        "platform": "android",
+        "runArguments": [
+          "--mode=devDebug",
+          "--appId",
+          "com.reactnativetemplate.dev"
+        ]
+      },
+      {
+        "name": "Android Debug Staging",
+        "request": "launch",
+        "type": "reactnative",
+        "cwd": "${workspaceFolder}",
+        "platform": "android",
+        "runArguments": [
+          "--mode=stagingDebug",
+          "--appId",
+          "com.reactnativetemplate.stg"
+        ]
+      },
+      {
+        "name": "Android Debug Production",
+        "request": "launch",
+        "type": "reactnative",
+        "cwd": "${workspaceFolder}",
+        "platform": "android",
+        "runArguments": [
+          "--mode=prodDebug",
+          "--appId",
+          "com.reactnativetemplate.prod"
+        ]
+      }
+    ]
+  }
+  

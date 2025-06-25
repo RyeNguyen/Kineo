@@ -1,0 +1,8 @@
+API_BASE_URL=https:/$()/api.example.com1
+APP_NAME=ReactNativeTemplateDEV
+ANDROID_APP_ID=com.reactnativetemplate
+ANDROID_APP_VERSION_NAME=1.0.0
+ANDROID_APP_VERSION_CODE=1
+IOS_APP_ID=com.reactnativetemplate
+IOS_APP_VERSION_CODE=1.0.0
+IOS_APP_BUILD_CODE=1
