@@ -1,21 +1,22 @@
-import { DEVICE_SIZE } from "@/shared/constant";
+/* eslint-disable import/no-extraneous-dependencies */
+import type { MovieWithMetadata } from "@/features/movie/store/movieSlice";
+import { COMMON_NUMBERS, DEVICE_SIZE } from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
 import React, { memo } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 
-interface Props {
+interface TrailerCardProps {
   isPaused: boolean;
+  movie: MovieWithMetadata;
   onStateChange: (state: string) => void;
-  trailerKey: string;
 }
 
-const YOUTUBE_ASPECT_RATIO = 16 / 9;
-const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, 400); // or any max width you want
-const VIDEO_HEIGHT = VIDEO_WIDTH / YOUTUBE_ASPECT_RATIO;
+const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, 400);
+const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
 
-const TrailerCard = ({ isPaused, onStateChange, trailerKey }: Props) => {
-  const { backgrounds, layout } = useTheme();
+const TrailerCard = ({ isPaused, movie, onStateChange }: TrailerCardProps) => {
+  const { backgrounds, fonts, gutters, layout } = useTheme();
 
   return (
     <View
@@ -24,20 +25,37 @@ const TrailerCard = ({ isPaused, onStateChange, trailerKey }: Props) => {
         layout.itemsCenter,
         layout.justifyCenter,
         backgrounds.black,
-        { height: DEVICE_SIZE.height },
+        { height: DEVICE_SIZE.height, borderWidth: 2, borderColor: "red" },
       ]}
     >
       <YoutubeIframe
         height={VIDEO_HEIGHT}
         initialPlayerParams={{
-          controls: false, // Hide the controls
-          loop: true, // Loop the video
+          controls: false,
+          loop: true,
+          modestbranding: 1,
+          playlist: movie.trailerKey,
+          rel: 0,
+          showinfo: 0,
         }}
         onChangeState={onStateChange}
         play={!isPaused}
-        videoId={trailerKey}
+        videoId={movie.trailerKey}
         width={VIDEO_WIDTH}
       />
+
+      <View
+        style={[
+          layout.absolute,
+          layout.left0,
+          layout.bottom0,
+          layout.itemsStart,
+          gutters.gap_TINY,
+        ]}
+      >
+        <Text style={[fonts.white]}>{movie.title}</Text>
+        <Text style={[fonts.white]}>{movie.overview}</Text>
+      </View>
     </View>
   );
 };

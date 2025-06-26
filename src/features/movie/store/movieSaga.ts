@@ -24,7 +24,7 @@ import {
   getMovieTrailersApi,
   getPopularMoviesApi,
 } from "../services";
-import { VOTE_COUNT } from "@/shared/constant";
+import { COMMON_NUMBERS } from "@/shared/constant";
 
 function* getMovieTrailerRequest(
   movie: Movie
@@ -74,7 +74,7 @@ function* getDiscoveredMoviesRequest(
       {
         page: 1,
         sort_by: "popularity.desc",
-        "vote_count.gte": VOTE_COUNT.medium,
+        "vote_count.gte": COMMON_NUMBERS.voteCount,
       }
     )) as MovieResponse;
 
@@ -86,7 +86,7 @@ function* getDiscoveredMoviesRequest(
       {
         page: randomPage,
         sort_by: "popularity.desc",
-        "vote_count.gte": VOTE_COUNT.medium,
+        "vote_count.gte": COMMON_NUMBERS.voteCount,
       }
     )) as MovieResponse;
 

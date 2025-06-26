@@ -23,6 +23,8 @@ export const COMMON_NUMBERS = {
   maxNameLength: 20,
   minNameLength: 3,
   minPasswordLength: 6,
+  voteCount: 200,
+  youtubeAspectRatio: 16 / 9,
 };
 
 export const VOTE_COUNT = {

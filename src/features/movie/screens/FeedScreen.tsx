@@ -5,6 +5,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 
 import type { Paths } from "@/navigation/paths";
 import useTheme from "@/shared/hook/useTheme";
@@ -12,9 +13,13 @@ import { SafeScreen, TrailerCard } from "@/shared/components/molecules";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RootScreenProps } from "@/types";
-import type { MovieState } from "@/features/movie/store/movieSlice";
+import type {
+  MovieState,
+  MovieWithMetadata,
+} from "@/features/movie/store/movieSlice";
 import { getDiscoveredMovies } from "@/features/movie/store/movieSlice";
 import { StateStatus } from "@/config";
+import { DEVICE_SIZE } from "@/shared/constant";
 
 function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { backgrounds, components, fonts, gutters, layout } = useTheme();
@@ -23,7 +28,6 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { discoveries } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
-  console.log("🚀 ~ StartupScreen ~ discoveries:", discoveries);
   const [visibleItemIndex, setVisibleItemIndex] = useState(0);
 
   useEffect(() => {
@@ -55,25 +59,29 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     <SafeScreen>
       <FlatList
         data={discoveries.data}
+        // estimatedItemSize={DEVICE_SIZE.height}
         initialNumToRender={3}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item: MovieWithMetadata, index: number) =>
+          (item.id || index).toString()
+        }
         maxToRenderPerBatch={3}
         onViewableItemsChanged={onViewableItemsChanged}
-        pagingEnabled // This is the key for the swipe effect
+        pagingEnabled
         // These help with performance
         removeClippedSubviews={true}
         renderItem={({ index, item }) => (
           <TrailerCard
             isPaused={index !== visibleItemIndex}
+            movie={item}
             onStateChange={(state) => {
               if (state === "ended") {
                 console.log("Video ended");
               }
             }}
-            trailerKey={item.trailerKey!}
           />
         )}
         showsVerticalScrollIndicator={false}
+        style={[layout.flex_1, { borderWidth: 2, borderColor: "#fff" }]}
         viewabilityConfig={viewabilityConfig}
         windowSize={5}
       />
