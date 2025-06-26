@@ -22,7 +22,8 @@
   "common": {
     "error": {
       "common_error": "Oops! Something went wrong.",
-      "no_internet": "No internet connection!"
+      "no_internet": "No internet connection!",
+      "unknown_error": "An unknown error occurred!"
     }
   },
   "auth": {

@@ -1,24 +1,24 @@
-import 'react-native-gesture-handler';
+import "react-native-gesture-handler";
 
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { MMKV } from 'react-native-mmkv';
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { MMKV } from "react-native-mmkv";
 
-import ApplicationNavigator from '@/navigation/Application';
+import ApplicationNavigator from "@/navigation/Application";
 
-import '@/translations';
+import "@/translations";
 
-import type { AuthState } from './features/auth/store/authSlice';
+import type { AuthState } from "./features/auth/store/authSlice";
 
-import NetInfo from '@react-native-community/netinfo';
-import { useEffect } from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
+import NetInfo from "@react-native-community/netinfo";
+import { useEffect } from "react";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
-import { ErrorModal, NetworkBanner } from './shared/components';
-import ThemeProvider from './config/theme/ThemeProvider/ThemeProvider';
-import { logoutRequest } from './features/auth/store/authSlice';
-import { setNetworkStatus } from './features/network/store/networkSlice';
-import { persistor, store } from './redux/store';
+import { ErrorModal, NetworkBanner } from "./shared/components/atoms";
+import ThemeProvider from "./config/theme/ThemeProvider/ThemeProvider";
+import { logoutRequest } from "./features/auth/store/authSlice";
+import { setNetworkStatus } from "./features/network/store/networkSlice";
+import { persistor, store } from "./redux/store";
 
 export const storage = new MMKV();
 
@@ -41,7 +41,7 @@ const NetworkListener = () => {
 const MainApp = () => {
   const dispatch = useDispatch();
   const expiredToken = useSelector(
-    (state: { auth: AuthState }) => state.auth.expiredToken,
+    (state: { auth: AuthState }) => state.auth.expiredToken
   );
   const onCloseErrorModal = () => {
     dispatch(logoutRequest());

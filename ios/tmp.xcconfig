@@ -1,5 +1,6 @@
-API_BASE_URL=https:/$()/api.example.com1
-APP_NAME=ReactNativeTemplateDEV
+API_BASE_URL=https:/$()/api.themoviedb.org/3
+API_KEY=3061a0e7163dc3e0c1816a4e88ceb386
+APP_NAME=ReactNativeTemplate
 ANDROID_APP_ID=com.reactnativetemplate
 ANDROID_APP_VERSION_NAME=1.0.0
 ANDROID_APP_VERSION_CODE=1

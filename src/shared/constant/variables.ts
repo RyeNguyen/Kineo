@@ -24,3 +24,7 @@ export const COMMON_NUMBERS = {
   minNameLength: 3,
   minPasswordLength: 6,
 };
+
+export const VOTE_COUNT = {
+  medium: 200,
+};

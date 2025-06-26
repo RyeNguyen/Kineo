@@ -2,7 +2,7 @@ import { Keyboard, View } from "react-native";
 
 import type { Paths } from "@/navigation/paths";
 import useTheme from "@/shared/hook/useTheme";
-import { Button, Input, Mascot, SafeScreen } from "@/shared/components";
+import { Button, Input, Mascot, SafeScreen } from "@/shared/components/atoms";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import type { RootScreenProps } from "@/types";
@@ -23,6 +23,11 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
+import {
+  getDiscoveredMovies,
+  getPopularMovies,
+  MovieState,
+} from "@/features/movie/store/movieSlice";
 import api from "@/services/axiosConfig";
 
 function StartupScreen({ navigation }: RootScreenProps<Paths.Startup>) {
@@ -69,6 +74,11 @@ function StartupScreen({ navigation }: RootScreenProps<Paths.Startup>) {
     };
   });
 
+  const { discoveries } = useSelector(
+    (state: { movie: MovieState }) => state.movie
+  );
+  console.log("🚀 ~ StartupScreen ~ discoveries:", discoveries);
+
   useEffect(() => {
     hasValue.value = !!firstNameValue || !!lastNameValue;
 
@@ -85,22 +95,8 @@ function StartupScreen({ navigation }: RootScreenProps<Paths.Startup>) {
   };
 
   useEffect(() => {
-    const fetchPopularMovies = async () => {
-      try {
-        console.log('Fetching popular movies...');
-        // Make a GET request to the '/movie/popular' endpoint
-        const response = await api.get('/movie/popular?page=1&include_video=true');
-
-        console.log('API Response:', response.data);
-
-      } catch (err: any) {
-        console.error('Failed to fetch movies:', err.message);
-      } finally {
-      }
-    };
-
-    fetchPopularMovies();
-  }, []);
+    dispatch(getDiscoveredMovies());
+  }, [dispatch]);
 
   return (
     <SafeScreen>
@@ -122,9 +118,9 @@ function StartupScreen({ navigation }: RootScreenProps<Paths.Startup>) {
             layout.flex_1,
           ]}
         >
-          <Mascot />
+          {/* <Mascot /> */}
 
-          <View>
+          {/* <View>
             <Animated.Text style={[animatedHeadlineStyle]}>
               {t("startup:headline")}
             </Animated.Text>
@@ -185,12 +181,12 @@ function StartupScreen({ navigation }: RootScreenProps<Paths.Startup>) {
                 )}
               />
             </View>
-          </View>
+          </View> */}
         </View>
 
-        <View style={[layout.row, layout.fullWidth, layout.justifyEnd]}>
+        {/* <View style={[layout.row, layout.fullWidth, layout.justifyEnd]}>
           <Button icon={ICONS.iconNextWhite} onPress={handleSubmit(onSubmit)} />
-        </View>
+        </View> */}
       </View>
     </SafeScreen>
   );

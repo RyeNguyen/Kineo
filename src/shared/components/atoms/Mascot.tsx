@@ -3,7 +3,7 @@ import Svg, { Path, Rect, Ellipse } from "react-native-svg";
 
 import useTheme from "@/shared/hook/useTheme";
 import { StyleProp, ViewStyle } from "react-native";
-import { MASCOT_SIZE } from "../constant";
+import { MASCOT_SIZE } from "../../constant";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,

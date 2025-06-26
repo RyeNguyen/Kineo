@@ -17,7 +17,7 @@ import { Paths } from "@/navigation/paths";
 import { StateStatus } from "@/config";
 import { loginRequest, resetError } from "@/features/auth/store/authSlice";
 
-import { Button, Input, Mascot, SafeScreen } from "@/shared/components";
+import { Button, Input, Mascot, SafeScreen } from "@/shared/components/atoms";
 
 import useTheme from "@/shared/hook/useTheme";
 import { COMMON_NUMBERS, DEVICE_SIZE, ICONS } from "@/shared/constant";

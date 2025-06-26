@@ -1,4 +1,4 @@
-import { StateStatus } from "../constant";
+import type { StateStatus } from "../constant";
 
 export type defaultStoreData<T> = {
   data: T;

@@ -1,12 +1,11 @@
-import type { RootStackParamList } from '@/types';
+import type { RootStackParamList } from "@/types";
 
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator } from "@react-navigation/stack";
 
-import { Paths } from '@/navigation/paths';
+import { Paths } from "@/navigation/paths";
 
-import { StartupScreen } from '@/features/user/screens';
-
-import { useTheme } from '@/shared/hook';
+import { useTheme } from "@/shared/hook";
+import { FeedScreen } from "@/features/movie/screens";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -15,11 +14,11 @@ export function AppNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName={Paths.Startup}
+      initialRouteName={Paths.Feed}
       key={variant}
       screenOptions={{ headerShown: false }}
     >
-      <Stack.Screen component={StartupScreen} name={Paths.Startup} />
+      <Stack.Screen component={FeedScreen} name={Paths.Feed} />
     </Stack.Navigator>
   );
 }

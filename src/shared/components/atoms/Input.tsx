@@ -10,7 +10,7 @@ import { Text, TextInput, TouchableOpacity, View } from "react-native";
 
 import useTheme from "@/shared/hook/useTheme";
 import IconByVariant from "./IconByVariant";
-import { ICONS } from "../constant";
+import { ICONS } from "../../constant";
 
 interface CustomTextInputProps extends TextInputProps {
   errorMsg?: string;
