@@ -25,14 +25,14 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { backgrounds, components, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
-  const { discoveries } = useSelector(
-    (state: { movie: MovieState }) => state.movie
-  );
+  const { movies } = useSelector((state: { movie: MovieState }) => state.movie);
   const [visibleItemIndex, setVisibleItemIndex] = useState(0);
 
   useEffect(() => {
-    dispatch(getDiscoveredMovies());
-  }, [dispatch]);
+    if (movies.data.length === 0) {
+      dispatch(getDiscoveredMovies());
+    }
+  }, [dispatch, movies.data.length]);
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -44,10 +44,14 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     itemVisiblePercentThreshold: 50,
   }).current;
 
-  if (
-    discoveries.status === StateStatus.LOADING &&
-    discoveries.data.length === 0
-  ) {
+  const handleLoadMore = () => {
+    // Prevent multiple requests while one is already pending
+    if (movies.status !== StateStatus.LOADING) {
+      dispatch(getDiscoveredMovies());
+    }
+  };
+
+  if (movies.status === StateStatus.LOADING && movies.data.length === 0) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator color="#fff" size="large" />
@@ -58,30 +62,29 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   return (
     <SafeScreen>
       <FlatList
-        data={discoveries.data}
+        data={movies.data}
         // estimatedItemSize={DEVICE_SIZE.height}
         initialNumToRender={3}
         keyExtractor={(item: MovieWithMetadata, index: number) =>
           (item.id || index).toString()
         }
+        ListFooterComponent={() => {
+          return movies.status === StateStatus.LOADING ? (
+            <ActivityIndicator color="#fff" size="large" />
+          ) : null;
+        }}
         maxToRenderPerBatch={3}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.8}
         onViewableItemsChanged={onViewableItemsChanged}
         pagingEnabled
         // These help with performance
         removeClippedSubviews={true}
         renderItem={({ index, item }) => (
-          <TrailerCard
-            isPaused={index !== visibleItemIndex}
-            movie={item}
-            onStateChange={(state) => {
-              if (state === "ended") {
-                console.log("Video ended");
-              }
-            }}
-          />
+          <TrailerCard isPaused={index !== visibleItemIndex} movie={item} />
         )}
         showsVerticalScrollIndicator={false}
-        style={[layout.flex_1, { borderWidth: 2, borderColor: "#fff" }]}
+        style={[layout.flex_1]}
         viewabilityConfig={viewabilityConfig}
         windowSize={5}
       />

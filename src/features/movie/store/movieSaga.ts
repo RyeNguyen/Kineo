@@ -6,25 +6,23 @@ import type {
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { t } from "i18next";
 
-import { all, call, put, takeLatest } from "redux-saga/effects";
+import { all, put, select, takeLatest } from "redux-saga/effects";
 
 import { callApiWithNetworkCheck } from "@/shared";
 
-import type { MovieWithMetadata } from "./movieSlice";
+import type { MovieState, MovieWithMetadata } from "./movieSlice";
 import {
+  addFetchedPage,
   getDiscoveredMovies,
   getDiscoveredMoviesFailure,
   getDiscoveredMoviesSuccess,
   getPopularMovies,
-  getPopularMoviesFailure,
-  getPopularMoviesSuccess,
+  setTotalPages,
 } from "./movieSlice";
-import {
-  getDiscoveredMoviesApi,
-  getMovieTrailersApi,
-  getPopularMoviesApi,
-} from "../services";
+import { getDiscoveredMoviesApi, getMovieTrailersApi } from "../services";
 import { COMMON_NUMBERS } from "@/shared/constant";
+
+const getMovieState = (state: { movie: MovieState }) => state.movie;
 
 function* getMovieTrailerRequest(
   movie: Movie
@@ -54,32 +52,46 @@ function* getMovieTrailerRequest(
 function* getPopularMoviesRequest(
   action: PayloadAction<void>
 ): Generator<unknown, void, unknown> {
-  try {
-    const response = yield callApiWithNetworkCheck(getPopularMoviesApi);
-
-    yield put(getPopularMoviesSuccess(response)); // Dispatch success action
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : t("common:error.unknown_error");
-    yield put(getPopularMoviesFailure(errorMessage)); // Dispatch failure action
-  }
+  // try {
+  //   const response = yield callApiWithNetworkCheck(getPopularMoviesApi);
+  //   yield put(getPopularMoviesSuccess(response)); // Dispatch success action
+  // } catch (error: unknown) {
+  //   const errorMessage =
+  //     error instanceof Error ? error.message : t("common:error.unknown_error");
+  //   yield put(getPopularMoviesFailure(errorMessage)); // Dispatch failure action
+  // }
 }
 
 function* getDiscoveredMoviesRequest(
   action: PayloadAction<void>
 ): Generator<unknown, void, unknown> {
   try {
-    const discoverResponse = (yield callApiWithNetworkCheck(
-      getDiscoveredMoviesApi,
-      {
-        page: 1,
-        sort_by: "popularity.desc",
-        "vote_count.gte": COMMON_NUMBERS.voteCount,
-      }
-    )) as MovieResponse;
+    // Get the current state from the store
+    const { fetchedPages, totalPages } = (yield select(
+      getMovieState
+    )) as MovieState;
 
-    const totalPages = Math.min(discoverResponse.total_pages || 0, 500);
-    const randomPage = Math.floor(Math.random() * totalPages) + 1;
+    let pagesToUse = totalPages;
+
+    // --- LOGIC FOR THE VERY FIRST FETCH ---
+    if (pagesToUse === 0) {
+      const discoverResponse = (yield callApiWithNetworkCheck(
+        getDiscoveredMoviesApi,
+        {
+          page: 1,
+          sort_by: "popularity.desc",
+          "vote_count.gte": COMMON_NUMBERS.voteCount,
+        }
+      )) as MovieResponse;
+      pagesToUse = Math.min(discoverResponse.total_pages || 0, 500);
+      yield put(setTotalPages(pagesToUse)); // Set total pages in the state
+    }
+
+    // --- LOGIC TO FIND A NEW, UNIQUE RANDOM PAGE ---
+    let randomPage;
+    do {
+      randomPage = Math.floor(Math.random() * pagesToUse) + 1;
+    } while (fetchedPages.includes(randomPage)); // Keep picking until we find a page we haven't fetched
 
     const moviesResponse = (yield callApiWithNetworkCheck(
       getDiscoveredMoviesApi,
@@ -90,10 +102,15 @@ function* getDiscoveredMoviesRequest(
       }
     )) as MovieResponse;
 
+    // Add the new page to list of fetched pages
+    yield put(addFetchedPage(randomPage));
+
     const movies: Movie[] = moviesResponse.results || [];
 
     const moviesWithTrailers = (yield all(
-      movies.map((movie) => call(getMovieTrailerRequest, movie))
+      movies.map((movie) =>
+        callApiWithNetworkCheck(getMovieTrailerRequest, movie)
+      )
     )) as MovieWithMetadata[];
 
     yield put(getDiscoveredMoviesSuccess(moviesWithTrailers)); // Dispatch success action

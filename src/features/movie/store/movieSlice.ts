@@ -10,39 +10,50 @@ export interface MovieWithMetadata extends Movie {
 }
 
 export interface MovieState {
-  discoveries: defaultStoreData<MovieWithMetadata[]>;
+  currentPage: number;
   error: string;
+  fetchedPages: number[];
+  movies: defaultStoreData<MovieWithMetadata[]>;
   popular: defaultStoreData<MovieWithMetadata[]>;
   status: StateStatus;
+  totalPages: number;
 }
 
 const initialState: MovieState = {
-  discoveries: {
+  currentPage: 0,
+  error: "",
+  fetchedPages: [],
+  movies: {
     data: [],
     error: "",
     status: StateStatus.INIT,
   },
-  error: "",
   popular: {
     data: [],
     error: "",
     status: StateStatus.INIT,
   },
   status: StateStatus.INIT,
+  totalPages: 0,
 };
 
 const movieSlice = createSlice({
   initialState,
   name: "movie",
   reducers: {
+    addFetchedPage: (state, action: PayloadAction<number>) => {
+      if (!state.fetchedPages.includes(action.payload)) {
+        state.fetchedPages.push(action.payload);
+      }
+    },
     getDiscoveredMovies: (state) => {
-      Object.assign(state.discoveries, {
+      Object.assign(state.movies, {
         error: "",
         status: StateStatus.LOADING,
       });
     },
     getDiscoveredMoviesFailure: (state, action: PayloadAction<string>) => {
-      Object.assign(state.discoveries, {
+      Object.assign(state.movies, {
         error: action.payload,
         status: StateStatus.ERROR,
       });
@@ -51,8 +62,8 @@ const movieSlice = createSlice({
       state,
       action: PayloadAction<MovieWithMetadata[]>
     ) => {
-      Object.assign(state.discoveries, {
-        data: action.payload,
+      Object.assign(state.movies, {
+        data: [...state.movies.data, ...action.payload],
         error: "",
         status: StateStatus.SUCCESS,
       });
@@ -79,15 +90,20 @@ const movieSlice = createSlice({
         status: StateStatus.SUCCESS,
       });
     },
+    setTotalPages: (state, action: PayloadAction<number>) => {
+      state.totalPages = action.payload;
+    },
   },
 });
 
 export const {
+  addFetchedPage,
   getDiscoveredMovies,
   getDiscoveredMoviesFailure,
   getDiscoveredMoviesSuccess,
   getPopularMovies,
   getPopularMoviesFailure,
   getPopularMoviesSuccess,
+  setTotalPages,
 } = movieSlice.actions;
 export default movieSlice.reducer;
