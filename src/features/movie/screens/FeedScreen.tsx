@@ -1,3 +1,4 @@
+import type { LayoutChangeEvent } from "react-native";
 import {
   ActivityIndicator,
   RefreshControl,
@@ -39,7 +40,8 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
   const { movies, status } = pagination[activeTab];
 
-  const [visibleItemIndex, setVisibleItemIndex] = useState(0);
+  const [visibleItemIndex, setVisibleItemIndex] = useState<number>(0);
+  const [layoutHeight, setLayoutHeight] = useState<number>(0);
 
   const isRefreshing = status === StateStatus.LOADING && movies.length > 0;
 
@@ -88,8 +90,13 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     );
   }
 
+  const onLayout = (event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setLayoutHeight(height);
+  };
+
   return (
-    <SafeScreen>
+    <SafeScreen onLayout={onLayout}>
       <FlashList
         data={movies}
         estimatedItemSize={DEVICE_SIZE.height}
@@ -118,15 +125,32 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
         refreshing={isRefreshing}
         // These help with performance
         removeClippedSubviews={true}
-        renderItem={({ index, item }) => (
-          <TrailerCard isPaused={index !== visibleItemIndex} movie={item} />
+        renderItem={({
+          index,
+          item,
+        }: {
+          index: number;
+          item: MovieWithMetadata;
+        }) => (
+          <TrailerCard
+            cardHeight={layoutHeight}
+            isPaused={index !== visibleItemIndex}
+            movie={item}
+          />
         )}
         showsVerticalScrollIndicator={false}
-        style={[layout.flex_1]}
         viewabilityConfig={viewabilityConfig}
       />
 
-      <View style={[layout.absolute, layout.left0, layout.right0, layout.z10]}>
+      <View
+        style={[
+          layout.absolute,
+          layout.left0,
+          layout.right0,
+          layout.z10,
+          gutters.padding_MEDIUM,
+        ]}
+      >
         <FeedTabs activeTab={activeTab} onTabPress={handleTabPress} />
       </View>
     </SafeScreen>
@@ -134,10 +158,6 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "#000",
-    flex: 1,
-  },
   loaderContainer: {
     alignItems: "center",
     backgroundColor: "#000",

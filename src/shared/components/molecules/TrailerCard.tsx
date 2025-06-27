@@ -16,6 +16,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 
 interface TrailerCardProps {
+  cardHeight?: number;
   isPaused: boolean;
   movie: MovieWithMetadata;
 }
@@ -23,7 +24,11 @@ interface TrailerCardProps {
 const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
 const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
 
-const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
+const TrailerCard = ({
+  cardHeight = DEVICE_SIZE.height,
+  isPaused,
+  movie,
+}: TrailerCardProps) => {
   const { backgrounds, fonts, gutters, layout } = useTheme();
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -70,7 +75,7 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
         layout.itemsCenter,
         layout.justifyCenter,
         backgrounds.black,
-        { height: DEVICE_SIZE.height },
+        { height: cardHeight },
       ]}
     >
       <YoutubeIframe

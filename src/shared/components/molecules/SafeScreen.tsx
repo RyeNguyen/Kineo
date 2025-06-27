@@ -44,7 +44,7 @@ function SafeScreen({
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       style={[layout.flex_1]}
     >
-      <SafeAreaView {...props} mode="padding" style={[layout.flex_1, style]}>
+      <SafeAreaView {...props} mode="margin" style={[layout.flex_1, style]}>
         <StatusBar
           backgroundColor={navigationTheme.colors.background}
           barStyle={variant === "dark" ? "light-content" : "dark-content"}

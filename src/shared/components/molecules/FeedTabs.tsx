@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import useTheme from "@/shared/hook/useTheme";
 import { TabCategory } from "@/config";
+import { verticalScale } from "@/shared/utils";
 
 interface FeedTabsProps {
   activeTab: TabCategory;
@@ -9,11 +10,15 @@ interface FeedTabsProps {
 }
 
 const FeedTabs = ({ activeTab, onTabPress }: FeedTabsProps) => {
-  const { fonts } = useTheme();
+  const { backgrounds, borders, fonts, gutters, layout } = useTheme();
 
   return (
     <ScrollView
-      contentContainerStyle={styles.container}
+      contentContainerStyle={[
+        layout.row,
+        layout.itemsStart,
+        gutters.gap_MEDIUM,
+      ]}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
@@ -23,19 +28,27 @@ const FeedTabs = ({ activeTab, onTabPress }: FeedTabsProps) => {
           <Pressable
             key={tab}
             onPress={() => onTabPress(tab)}
-            style={styles.tab}
+            style={[layout.itemsEnd, gutters.gap_XSMALL]}
           >
             <Text
               style={[
                 isActive
-                  ? fonts.size_MD_BeVietnamProBold
-                  : fonts.size_MD_BeVietnamProRegular,
+                  ? fonts.size_SM_BeVietnamProBold
+                  : fonts.size_SM_BeVietnamProRegular,
                 isActive ? fonts.white : fonts.gray400,
               ]}
             >
               {tab}
             </Text>
-            {isActive && <View style={styles.activeIndicator} />}
+            {isActive && (
+              <View
+                style={[
+                  backgrounds.white,
+                  borders.rounded_16,
+                  styles.activeIndicator,
+                ]}
+              />
+            )}
           </Pressable>
         );
       })}
@@ -45,21 +58,8 @@ const FeedTabs = ({ activeTab, onTabPress }: FeedTabsProps) => {
 
 const styles = StyleSheet.create({
   activeIndicator: {
-    backgroundColor: "white",
-    borderRadius: 2,
-    height: 3,
-    marginTop: 6,
-    width: "60%",
-  },
-  container: {
-    alignItems: "center",
-    flexDirection: "row",
-    paddingHorizontal: 16,
-  },
-  tab: {
-    alignItems: "center",
-    marginHorizontal: 8,
-    paddingVertical: 12,
+    height: verticalScale(4),
+    width: "40%",
   },
 });
 
