@@ -11,11 +11,14 @@ export const getPopularMoviesApi = async (): Promise<unknown> => {
   }
 };
 
-export const getDiscoveredMoviesApi = async (
-  params: unknown
-): Promise<MovieResponse> => {
+export const getDiscoveredMoviesApi = async ({
+  endpoint,
+  ...params
+}: {
+  endpoint: string;
+}): Promise<MovieResponse> => {
   try {
-    const response = await api.get(MovieEndPoint.DISCOVER, { params });
+    const response = await api.get(endpoint, { params });
     return response.data;
   } catch (error) {
     console.log(error);

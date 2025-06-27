@@ -13,13 +13,16 @@ import { callApiWithNetworkCheck } from "@/shared";
 import type { MovieState, MovieWithMetadata } from "./movieSlice";
 import {
   addFetchedPage,
+  clearMovieState,
   getDiscoveredMovies,
   getDiscoveredMoviesFailure,
   getDiscoveredMoviesSuccess,
-  getPopularMovies,
+  refreshMovies,
+  setCurrentPage,
   setTotalPages,
 } from "./movieSlice";
 import { getDiscoveredMoviesApi, getMovieTrailersApi } from "../services";
+import { MovieEndPoint, TabCategory } from "@/shared/constant";
 import { COMMON_NUMBERS } from "@/shared/constant";
 
 const getMovieState = (state: { movie: MovieState }) => state.movie;
@@ -49,61 +52,84 @@ function* getMovieTrailerRequest(
   }
 }
 
-function* getPopularMoviesRequest(
-  action: PayloadAction<void>
-): Generator<unknown, void, unknown> {
-  // try {
-  //   const response = yield callApiWithNetworkCheck(getPopularMoviesApi);
-  //   yield put(getPopularMoviesSuccess(response)); // Dispatch success action
-  // } catch (error: unknown) {
-  //   const errorMessage =
-  //     error instanceof Error ? error.message : t("common:error.unknown_error");
-  //   yield put(getPopularMoviesFailure(errorMessage)); // Dispatch failure action
-  // }
-}
-
 function* getDiscoveredMoviesRequest(
-  action: PayloadAction<void>
+  action: PayloadAction<unknown>
 ): Generator<unknown, void, unknown> {
   try {
     // Get the current state from the store
-    const { fetchedPages, totalPages } = (yield select(
+    const { activeTab, pagination } = (yield select(
       getMovieState
     )) as MovieState;
+    const { currentPage, fetchedPages, totalPages } = pagination[activeTab];
+
+    let endpoint = "";
+
+    switch (activeTab) {
+      case TabCategory.POPULAR:
+        endpoint = MovieEndPoint.POPULAR;
+        break;
+      case TabCategory.TOP_RATED:
+        endpoint = MovieEndPoint.TOP_RATED;
+        break;
+      case TabCategory.UPCOMING:
+        endpoint = MovieEndPoint.UPCOMING;
+        break;
+      case TabCategory.DISCOVER:
+      default:
+        endpoint = MovieEndPoint.DISCOVER;
+        break;
+    }
 
     let pagesToUse = totalPages;
 
     // --- LOGIC FOR THE VERY FIRST FETCH ---
     if (pagesToUse === 0) {
-      const discoverResponse = (yield callApiWithNetworkCheck(
-        getDiscoveredMoviesApi,
-        {
-          page: 1,
-          sort_by: "popularity.desc",
-          "vote_count.gte": COMMON_NUMBERS.voteCount,
-        }
-      )) as MovieResponse;
-      pagesToUse = Math.min(discoverResponse.total_pages || 0, 500);
+      const firstResponse =
+        endpoint === MovieEndPoint.DISCOVER
+          ? ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+              endpoint,
+              page: 1,
+              sort_by: "popularity.desc",
+              "vote_count.gte": COMMON_NUMBERS.voteCount,
+            })) as MovieResponse)
+          : ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+              endpoint,
+              page: 1,
+            })) as MovieResponse);
+      pagesToUse = Math.min(
+        firstResponse.total_pages || 0,
+        COMMON_NUMBERS.maxBrowsingPages
+      );
       yield put(setTotalPages(pagesToUse)); // Set total pages in the state
     }
 
-    // --- LOGIC TO FIND A NEW, UNIQUE RANDOM PAGE ---
-    let randomPage;
-    do {
-      randomPage = Math.floor(Math.random() * pagesToUse) + 1;
-    } while (fetchedPages.includes(randomPage)); // Keep picking until we find a page we haven't fetched
+    let moviesResponse: MovieResponse = {};
 
-    const moviesResponse = (yield callApiWithNetworkCheck(
-      getDiscoveredMoviesApi,
-      {
+    if (endpoint === MovieEndPoint.DISCOVER) {
+      // --- LOGIC TO FIND A NEW, UNIQUE RANDOM PAGE ---
+      let randomPage;
+      do {
+        randomPage = Math.floor(Math.random() * pagesToUse) + 1;
+      } while (fetchedPages.includes(randomPage)); // Keep picking until we find a page we haven't fetched
+
+      moviesResponse = (yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+        endpoint,
         page: randomPage,
         sort_by: "popularity.desc",
         "vote_count.gte": COMMON_NUMBERS.voteCount,
-      }
-    )) as MovieResponse;
-
-    // Add the new page to list of fetched pages
-    yield put(addFetchedPage(randomPage));
+      })) as MovieResponse;
+      yield put(setCurrentPage(randomPage));
+      // Add the new page to list of fetched pages
+      yield put(addFetchedPage(randomPage));
+    } else {
+      const newPage = currentPage + 1;
+      moviesResponse = (yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+        endpoint,
+        page: newPage,
+      })) as MovieResponse;
+      yield put(setCurrentPage(newPage));
+      yield put(addFetchedPage(newPage));
+    }
 
     const movies: Movie[] = moviesResponse.results || [];
 
@@ -121,7 +147,23 @@ function* getDiscoveredMoviesRequest(
   }
 }
 
+function* refreshFeedRequest(): Generator<unknown, void, unknown> {
+  try {
+    // First, dispatch the action to clear the current state
+    yield put(clearMovieState());
+    // Then, call the existing saga to fetch a new batch of movies
+    yield callApiWithNetworkCheck(getDiscoveredMoviesRequest, {
+      payload: undefined,
+      type: getDiscoveredMovies.type,
+    });
+  } catch (error) {
+    // Handle any errors during refresh if necessary
+    // eslint-disable-next-line no-console
+    console.error("Refresh failed", error);
+  }
+}
+
 export function* movieSaga() {
-  yield takeLatest(getPopularMovies.type, getPopularMoviesRequest);
   yield takeLatest(getDiscoveredMovies.type, getDiscoveredMoviesRequest);
+  yield takeLatest(refreshMovies.type, refreshFeedRequest);
 }

@@ -20,9 +20,12 @@ export const MASCOT_SIZE = {
 };
 
 export const COMMON_NUMBERS = {
+  maxBrowsingPages: 500,
   maxNameLength: 20,
+  maxVideoWidth: 400,
   minNameLength: 3,
   minPasswordLength: 6,
+  overviewCharacterLimit: 150,
   voteCount: 200,
   youtubeAspectRatio: 16 / 9,
 };

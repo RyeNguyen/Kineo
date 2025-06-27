@@ -3,8 +3,16 @@ import type { MovieWithMetadata } from "@/features/movie/store/movieSlice";
 import { COMMON_NUMBERS, DEVICE_SIZE } from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
 import { getYear } from "@/shared/utils/dateHelper";
-import React, { memo, useCallback, useMemo, useRef, useState } from "react";
-import { Pressable, Text, TouchableWithoutFeedback, View } from "react-native";
+import { t } from "i18next";
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 
 interface TrailerCardProps {
@@ -12,8 +20,7 @@ interface TrailerCardProps {
   movie: MovieWithMetadata;
 }
 
-const OVERVIEW_CHARACTER_LIMIT = 150;
-const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, 400);
+const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
 const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
 
 const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
@@ -21,9 +28,17 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
 
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const needsTruncation =
-    (movie.overview || []).length > OVERVIEW_CHARACTER_LIMIT;
+    (movie.overview || []).length > COMMON_NUMBERS.overviewCharacterLimit;
 
   const playerRef = useRef<typeof YoutubeIframe>(null);
+
+  useEffect(() => {
+    if (!isPaused) {
+      // If the video is NOT paused (i.e., it just became the active video),
+      // command it to restart from the beginning.
+      playerRef.current?.seekTo(0, true);
+    }
+  }, [isPaused]);
 
   const movieTitle = useMemo(() => {
     return `${movie.title} (${getYear(movie.release_date || Date.now().toString())})`;
@@ -34,7 +49,7 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
       return movie.overview;
     }
     // If it's collapsed and needs truncation, shorten it and add an ellipsis.
-    return `${(movie.overview || []).slice(0, OVERVIEW_CHARACTER_LIMIT)}... `;
+    return `${(movie.overview || []).slice(0, COMMON_NUMBERS.overviewCharacterLimit)}... `;
   }, [movie.overview, needsTruncation, isExpanded]);
 
   const onStateChange = useCallback((state: string) => {
@@ -58,22 +73,22 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
         { height: DEVICE_SIZE.height },
       ]}
     >
-      <TouchableWithoutFeedback>
-        <YoutubeIframe
-          height={VIDEO_HEIGHT}
-          initialPlayerParams={{
-            controls: false,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-          }}
-          onChangeState={onStateChange}
-          play={!isPaused}
-          ref={playerRef}
-          videoId={movie.trailerKey}
-          width={VIDEO_WIDTH}
-        />
-      </TouchableWithoutFeedback>
+      <YoutubeIframe
+        height={VIDEO_HEIGHT}
+        initialPlayerParams={{
+          controls: false,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+        }}
+        onChangeState={onStateChange}
+        play={!isPaused}
+        ref={playerRef}
+        videoId={movie.trailerKey}
+        width={VIDEO_WIDTH}
+      />
+
+      <View style={styles.touchBlocker} />
 
       <View
         style={[
@@ -82,6 +97,7 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
           layout.bottom0,
           layout.right0,
           layout.itemsStart,
+          layout.z10,
           gutters.gap_TINY,
           gutters.padding_MEDIUM,
         ]}
@@ -95,7 +111,7 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
             {movieOverview}
             {needsTruncation && (
               <Text style={[fonts.size_SM_BeVietnamProBold]}>
-                {isExpanded ? " Less" : " More"}
+                {isExpanded ? ` ${t("feed:less")}` : ` ${t("feed:more")}`}
               </Text>
             )}
           </Text>
@@ -104,6 +120,13 @@ const TrailerCard = ({ isPaused, movie }: TrailerCardProps) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  touchBlocker: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 1,
+  },
+});
 
 // memo prevents re-rendering of cards that are not visible
 export default memo(TrailerCard);

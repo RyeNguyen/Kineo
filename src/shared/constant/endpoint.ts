@@ -13,4 +13,6 @@ export const AuthEndPoint = {
 export const MovieEndPoint = {
   DISCOVER: `/discover/movie`,
   POPULAR: `/movie/popular`,
+  TOP_RATED: `/movie/top_rated`,
+  UPCOMING: `/movie/upcoming`,
 };

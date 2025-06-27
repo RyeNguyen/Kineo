@@ -1,15 +1,18 @@
 import {
   ActivityIndicator,
-  FlatList,
+  RefreshControl,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
 import type { Paths } from "@/navigation/paths";
 import useTheme from "@/shared/hook/useTheme";
-import { SafeScreen, TrailerCard } from "@/shared/components/molecules";
+import {
+  FeedTabs,
+  SafeScreen,
+  TrailerCard,
+} from "@/shared/components/molecules";
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RootScreenProps } from "@/types";
@@ -17,22 +20,34 @@ import type {
   MovieState,
   MovieWithMetadata,
 } from "@/features/movie/store/movieSlice";
-import { getDiscoveredMovies } from "@/features/movie/store/movieSlice";
+import {
+  getDiscoveredMovies,
+  refreshMovies,
+  setActiveTab,
+} from "@/features/movie/store/movieSlice";
 import { StateStatus } from "@/config";
+import type { TabCategory } from "@/shared/constant";
 import { DEVICE_SIZE } from "@/shared/constant";
 
 function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { backgrounds, components, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
-  const { movies } = useSelector((state: { movie: MovieState }) => state.movie);
+  const { activeTab, pagination } = useSelector(
+    (state: { movie: MovieState }) => state.movie
+  );
+  console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
+  const { movies, status } = pagination[activeTab];
+
   const [visibleItemIndex, setVisibleItemIndex] = useState(0);
 
+  const isRefreshing = status === StateStatus.LOADING && movies.length > 0;
+
   useEffect(() => {
-    if (movies.data.length === 0) {
+    if (movies.length === 0) {
       dispatch(getDiscoveredMovies());
     }
-  }, [dispatch, movies.data.length]);
+  }, [dispatch, movies.length]);
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
     if (viewableItems.length > 0) {
@@ -44,14 +59,28 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     itemVisiblePercentThreshold: 50,
   }).current;
 
+  const handleTabPress = useCallback(
+    (tab: TabCategory) => {
+      if (tab !== activeTab) {
+        dispatch(setActiveTab(tab));
+        dispatch(getDiscoveredMovies());
+      }
+    },
+    [activeTab, dispatch]
+  );
+
   const handleLoadMore = () => {
     // Prevent multiple requests while one is already pending
-    if (movies.status !== StateStatus.LOADING) {
+    if (status !== StateStatus.LOADING) {
       dispatch(getDiscoveredMovies());
     }
   };
 
-  if (movies.status === StateStatus.LOADING && movies.data.length === 0) {
+  const handleRefresh = useCallback(() => {
+    dispatch(refreshMovies());
+  }, [dispatch]);
+
+  if (status === StateStatus.LOADING && movies.length === 0) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator color="#fff" size="large" />
@@ -61,23 +90,32 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
 
   return (
     <SafeScreen>
-      <FlatList
-        data={movies.data}
-        // estimatedItemSize={DEVICE_SIZE.height}
-        initialNumToRender={3}
+      <FlashList
+        data={movies}
+        estimatedItemSize={DEVICE_SIZE.height}
+        extraData={visibleItemIndex}
         keyExtractor={(item: MovieWithMetadata, index: number) =>
           (item.id || index).toString()
         }
         ListFooterComponent={() => {
-          return movies.status === StateStatus.LOADING ? (
+          return status === StateStatus.LOADING ? (
             <ActivityIndicator color="#fff" size="large" />
           ) : null;
         }}
-        maxToRenderPerBatch={3}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.8}
+        onRefresh={handleRefresh}
         onViewableItemsChanged={onViewableItemsChanged}
         pagingEnabled
+        refreshControl={
+          <RefreshControl
+            colors={["#FFFFFF"]} // For Android, makes the spinner white
+            onRefresh={handleRefresh}
+            refreshing={isRefreshing}
+            tintColor="#FFFFFF" // For iOS, makes the spinner white
+          />
+        }
+        refreshing={isRefreshing}
         // These help with performance
         removeClippedSubviews={true}
         renderItem={({ index, item }) => (
@@ -86,8 +124,11 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
         showsVerticalScrollIndicator={false}
         style={[layout.flex_1]}
         viewabilityConfig={viewabilityConfig}
-        windowSize={5}
       />
+
+      <View style={[layout.absolute, layout.left0, layout.right0, layout.z10]}>
+        <FeedTabs activeTab={activeTab} onTabPress={handleTabPress} />
+      </View>
     </SafeScreen>
   );
 }

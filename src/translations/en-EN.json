@@ -64,5 +64,9 @@
       "first_name_max_length": "First name must be at most {{max}} characters long",
       "last_name_max_length": "Last name must be at most {{max}} characters long"
     }
+  },
+  "feed": {
+    "more": "More",
+    "less": "Less"
   }
 }
