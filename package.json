@@ -32,6 +32,7 @@
     "@gorhom/bottom-sheet": "^5",
     "@hookform/resolvers": "^5.0.1",
     "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-community/slider": "^4.5.7",
     "@react-navigation/native": "^7.0.15",
     "@react-navigation/stack": "^7.1.2",
     "@reduxjs/toolkit": "^2.6.0",

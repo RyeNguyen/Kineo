@@ -82,21 +82,13 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     dispatch(refreshMovies());
   }, [dispatch]);
 
-  if (status === StateStatus.LOADING && movies.length === 0) {
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator color="#fff" size="large" />
-      </View>
-    );
-  }
-
   const onLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
     setLayoutHeight(height);
   };
 
   return (
-    <SafeScreen onLayout={onLayout}>
+    <SafeScreen onLayout={onLayout} style={[backgrounds.black]}>
       <FlashList
         data={movies}
         estimatedItemSize={DEVICE_SIZE.height}
@@ -156,14 +148,5 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     </SafeScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  loaderContainer: {
-    alignItems: "center",
-    backgroundColor: "#000",
-    flex: 1,
-    justifyContent: "center",
-  },
-});
 
 export default FeedScreen;

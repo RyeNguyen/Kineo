@@ -7,6 +7,9 @@ export default {
   colReverse: {
     flexDirection: "column-reverse",
   },
+  hideOverflow: {
+    overflow: "hidden",
+  },
   itemsCenter: {
     alignItems: "center",
   },
