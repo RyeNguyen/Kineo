@@ -3,6 +3,7 @@ export { default as Button } from "./Button";
 export { default as DefaultError } from "./DefaultError";
 export { default as ErrorBoundary } from "./ErrorBoundary";
 export { default as ErrorModal } from "./ErrorModal";
+export { default as GlassmorphicElement } from "./GlassmorphicElement";
 export { default as IconByVariant } from "./IconByVariant";
 export { default as Input } from "./Input";
 export { default as Mascot } from "./Mascot";

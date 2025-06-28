@@ -39,7 +39,8 @@ import Slider from "@react-native-community/slider";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { moderateScale, verticalScale } from "@/shared/utils";
-import { Button, IconByVariant } from "../atoms";
+import { Button, GlassmorphicElement, IconByVariant } from "../atoms";
+import Config from "react-native-config";
 
 interface TrailerCardProps {
   cardHeight?: number;
@@ -108,7 +109,7 @@ const TrailerCard = ({
     if (!movie.poster_path) {
       return null;
     }
-    return `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+    return `${Config.IMAGE_BASE_URL}${movie.poster_path}`;
   }, [movie.poster_path]);
 
   const onStateChange = useCallback(async (state: string) => {
@@ -236,7 +237,7 @@ const TrailerCard = ({
         </TapGestureHandler>
       </View>
 
-      <Pressable
+      {/* <Pressable
         onPress={togglePlaying}
         style={[
           layout.z1,
@@ -246,13 +247,13 @@ const TrailerCard = ({
         ]}
       >
         {!isPlaying && (
-          <View style={[]}>
-            <Pressable onPress={togglePlaying}>
-              <IconByVariant path={ICONS.iconPlay} />
-            </Pressable>
-          </View>
+          <GlassmorphicElement
+            extraStyles={[gutters.padding_COLOSSAL, borders.rounded_100]}
+          >
+            <IconByVariant path={ICONS.iconPlay} />
+          </GlassmorphicElement>
         )}
-      </Pressable>
+      </Pressable> */}
 
       <View
         style={[
