@@ -6,6 +6,7 @@ import type {
 import {
   COMMON_NUMBERS,
   DEVICE_SIZE,
+  ICONS,
   StateStatus,
   VideoStatus,
 } from "@/shared/constant";
@@ -20,13 +21,25 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
+import type { TapGestureHandlerStateChangeEvent } from "react-native-gesture-handler";
+import {
+  GestureHandlerRootView,
+  State,
+  TapGestureHandler,
+} from "react-native-gesture-handler";
 import Slider from "@react-native-community/slider";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { moderateScale, verticalScale } from "@/shared/utils";
-import { Button } from "../atoms";
+import { Button, IconByVariant } from "../atoms";
 
 interface TrailerCardProps {
   cardHeight?: number;
@@ -126,6 +139,41 @@ const TrailerCard = ({
     setTimeout(() => setIsSeeking(false), COMMON_NUMBERS.afterSeekTimeout);
   }, []);
 
+  const togglePlaying = useCallback(() => {
+    setIsPlaying((prev) => !prev);
+  }, []);
+
+  const seekBackward = useCallback(() => {
+    const newTime = Math.max(0, progress - 10); // Prevents going below 0
+    playerRef.current?.seekTo(newTime, true);
+    setProgress(newTime);
+  }, [progress]);
+
+  const seekForward = useCallback(() => {
+    // We can add a check to not seek beyond the duration if we want
+    const newTime = progress + 10;
+    playerRef.current?.seekTo(newTime, true);
+    setProgress(newTime);
+  }, [progress]);
+
+  const onLeftDoubleTap = useCallback(
+    ({ nativeEvent }: TapGestureHandlerStateChangeEvent) => {
+      if (nativeEvent.state === State.ACTIVE) {
+        seekBackward();
+      }
+    },
+    [seekBackward]
+  );
+
+  const onRightDoubleTap = useCallback(
+    ({ nativeEvent }: TapGestureHandlerStateChangeEvent) => {
+      if (nativeEvent.state === State.ACTIVE) {
+        seekForward();
+      }
+    },
+    [seekForward]
+  );
+
   if (status === StateStatus.LOADING && movies.length === 0) {
     return (
       <View
@@ -144,7 +192,7 @@ const TrailerCard = ({
   }
 
   return (
-    <View
+    <GestureHandlerRootView
       style={[
         layout.flex_1,
         layout.itemsCenter,
@@ -169,6 +217,42 @@ const TrailerCard = ({
       />
 
       <View style={styles.touchBlocker} />
+
+      <View style={[layout.row, layout.flex_1, styles.touchableOverlay]}>
+        {/* Left Side for Rewind */}
+        <TapGestureHandler
+          numberOfTaps={2}
+          onHandlerStateChange={onLeftDoubleTap}
+        >
+          <Pressable onPress={togglePlaying} style={[layout.flex_1]} />
+        </TapGestureHandler>
+
+        {/* Right Side for Forward */}
+        <TapGestureHandler
+          numberOfTaps={2}
+          onHandlerStateChange={onRightDoubleTap}
+        >
+          <Pressable onPress={togglePlaying} style={[layout.flex_1]} />
+        </TapGestureHandler>
+      </View>
+
+      <Pressable
+        onPress={togglePlaying}
+        style={[
+          layout.z1,
+          layout.itemsCenter,
+          layout.justifyCenter,
+          styles.touchableOverlay,
+        ]}
+      >
+        {!isPlaying && (
+          <View style={[]}>
+            <Pressable onPress={togglePlaying}>
+              <IconByVariant path={ICONS.iconPlay} />
+            </Pressable>
+          </View>
+        )}
+      </Pressable>
 
       <View
         style={[
@@ -235,7 +319,7 @@ const TrailerCard = ({
           value={progress}
         />
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 
@@ -249,6 +333,9 @@ const styles = StyleSheet.create({
   moviePoster: {
     height: verticalScale(132),
     width: moderateScale(88),
+  },
+  touchableOverlay: {
+    ...StyleSheet.absoluteFillObject,
   },
   touchBlocker: {
     ...StyleSheet.absoluteFillObject,
