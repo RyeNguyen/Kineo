@@ -26,3 +26,9 @@ export enum TabCategory {
   TOP_RATED = "Top Rated",
   UPCOMING = "Upcoming",
 }
+
+export enum VideoStatus {
+  ENDED = "ended",
+  PAUSED = "paused",
+  PLAYING = "playing",
+}

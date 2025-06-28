@@ -17,25 +17,28 @@ const FeedTabs = ({ activeTab, onTabPress }: FeedTabsProps) => {
       contentContainerStyle={[
         layout.row,
         layout.itemsStart,
-        gutters.gap_MEDIUM,
+        layout.justifyEnd,
+        gutters.gap_LARGE,
       ]}
       horizontal
       showsHorizontalScrollIndicator={false}
     >
       {Object.values(TabCategory).map((tab) => {
         const isActive = tab === activeTab;
+
         return (
           <Pressable
             key={tab}
             onPress={() => onTabPress(tab)}
-            style={[layout.itemsEnd, gutters.gap_XSMALL]}
+            style={[layout.itemsEnd, gutters.gap_TINY]}
           >
             <Text
               style={[
+                layout.lineHeightMD,
                 isActive
-                  ? fonts.size_SM_BeVietnamProBold
+                  ? fonts.size_SM_BeVietnamProSemiBold
                   : fonts.size_SM_BeVietnamProRegular,
-                isActive ? fonts.white : fonts.gray400,
+                isActive ? fonts.primary400 : fonts.gray100,
               ]}
             >
               {tab}
@@ -43,7 +46,7 @@ const FeedTabs = ({ activeTab, onTabPress }: FeedTabsProps) => {
             {isActive && (
               <View
                 style={[
-                  backgrounds.white,
+                  backgrounds.primary400,
                   borders.rounded_16,
                   styles.activeIndicator,
                 ]}
@@ -58,8 +61,8 @@ const FeedTabs = ({ activeTab, onTabPress }: FeedTabsProps) => {
 
 const styles = StyleSheet.create({
   activeIndicator: {
-    height: verticalScale(4),
-    width: "40%",
+    height: verticalScale(3),
+    width: "52%",
   },
 });
 

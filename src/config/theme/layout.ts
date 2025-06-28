@@ -1,4 +1,5 @@
-import type { ViewStyle } from "react-native";
+import { verticalScale } from "@/shared";
+import type { TextStyle, ViewStyle } from "react-native";
 
 export default {
   col: {
@@ -72,6 +73,9 @@ export default {
   left0: {
     left: 0,
   },
+  lineHeightMD: {
+    lineHeight: verticalScale(22),
+  },
   relative: {
     position: "relative",
   },
@@ -90,4 +94,4 @@ export default {
   z10: {
     zIndex: 10,
   },
-} as const satisfies Record<string, ViewStyle>;
+} as const satisfies Record<string, TextStyle | ViewStyle>;

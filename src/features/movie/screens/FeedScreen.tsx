@@ -1,10 +1,5 @@
 import type { LayoutChangeEvent } from "react-native";
-import {
-  ActivityIndicator,
-  RefreshControl,
-  StyleSheet,
-  View,
-} from "react-native";
+import { ActivityIndicator, RefreshControl, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
 import type { Paths } from "@/navigation/paths";
@@ -28,7 +23,8 @@ import {
 } from "@/features/movie/store/movieSlice";
 import { StateStatus } from "@/config";
 import type { TabCategory } from "@/shared/constant";
-import { DEVICE_SIZE } from "@/shared/constant";
+import { DEVICE_SIZE, ICONS } from "@/shared/constant";
+import { IconByVariant } from "@/shared/components/atoms";
 
 function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { backgrounds, components, fonts, gutters, layout } = useTheme();
@@ -136,14 +132,19 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
 
       <View
         style={[
+          layout.row,
+          layout.itemsCenter,
           layout.absolute,
           layout.left0,
           layout.right0,
           layout.z10,
-          gutters.padding_MEDIUM,
+          gutters.gap_LARGE,
+          gutters.paddingHorizontal_MEDIUM,
+          gutters.paddingTop_XLARGE,
         ]}
       >
         <FeedTabs activeTab={activeTab} onTabPress={handleTabPress} />
+        <IconByVariant path={ICONS.iconFilter} />
       </View>
     </SafeScreen>
   );

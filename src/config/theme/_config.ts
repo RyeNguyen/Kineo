@@ -8,11 +8,11 @@ export const enum Variant {
 
 const colorsLight = {
   black: "#000000",
-  gray100: "#DFDFDF",
+  gray100: "#B2B2B2",
   gray200: "#A1A1A1",
-  gray400: "#4D4D4D",
+  gray400: "#535353",
   gray50: "#EFEFEF",
-  gray800: "#303030",
+  gray800: "#1D1D1D",
   purple100: "#E1E1EF",
   purple50: "#1B1A23",
   purple500: "#44427D",
@@ -22,7 +22,7 @@ const colorsLight = {
   white: "#ffffff",
 
   // Primary
-  primary400: "#597863",
+  primary400: "#98E5E5",
   primary500: "#45624E",
   primary600: "#5C665A",
 
@@ -32,11 +32,11 @@ const colorsLight = {
 
 const colorsDark = {
   black: "#000000",
-  gray100: "#000000",
+  gray100: "#B2B2B2",
   gray200: "#BABABA",
-  gray400: "#969696",
+  gray400: "#535353",
   gray50: "#EFEFEF",
-  gray800: "#E0E0E0",
+  gray800: "#1D1D1D",
   purple100: "#252732",
   purple50: "#1B1A23",
   purple500: "#A6A4F0",
@@ -46,7 +46,7 @@ const colorsDark = {
   white: "#ffffff",
 
   // Primary
-  primary400: "#597863",
+  primary400: "#98E5E5",
   primary500: "#45624E",
   primary600: "#5C665A",
 

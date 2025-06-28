@@ -3,7 +3,12 @@ import type {
   MovieState,
   MovieWithMetadata,
 } from "@/features/movie/store/movieSlice";
-import { COMMON_NUMBERS, DEVICE_SIZE, StateStatus } from "@/shared/constant";
+import {
+  COMMON_NUMBERS,
+  DEVICE_SIZE,
+  StateStatus,
+  VideoStatus,
+} from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
 import { getYear } from "@/shared/utils/dateHelper";
 import { t } from "i18next";
@@ -15,18 +20,13 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 import Slider from "@react-native-community/slider";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { moderateScale, verticalScale } from "@/shared/utils";
+import { Button } from "../atoms";
 
 interface TrailerCardProps {
   cardHeight?: number;
@@ -42,21 +42,17 @@ const TrailerCard = ({
   isPaused,
   movie,
 }: TrailerCardProps) => {
-  const { backgrounds, borders, fonts, gutters, layout } = useTheme();
+  const { backgrounds, borders, colors, fonts, gutters, layout } = useTheme();
 
   const { activeTab, pagination } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
   const { movies, status } = pagination[activeTab];
 
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [duration, setDuration] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [isSeeking, setIsSeeking] = useState<boolean>(false);
-
-  const needsTruncation =
-    (movie.overview || []).length > COMMON_NUMBERS.overviewCharacterLimit;
 
   const playerRef = useRef<typeof YoutubeIframe>(null);
 
@@ -80,7 +76,7 @@ const TrailerCard = ({
         if (currentTime !== undefined) {
           setProgress(currentTime);
         }
-      }, 500); // Poll every 500ms
+      }, COMMON_NUMBERS.pollingTime); // Poll every 500ms
     }
 
     // Cleanup function that clears the interval
@@ -95,14 +91,6 @@ const TrailerCard = ({
     return `${movie.title} (${getYear(movie.release_date || Date.now().toString())})`;
   }, [movie.title, movie.release_date]);
 
-  const movieOverview = useMemo(() => {
-    if (!needsTruncation || isExpanded) {
-      return movie.overview;
-    }
-    // If it's collapsed and needs truncation, shorten it and add an ellipsis.
-    return `${(movie.overview || []).slice(0, COMMON_NUMBERS.overviewCharacterLimit)}... `;
-  }, [movie.overview, needsTruncation, isExpanded]);
-
   const moviePoster = useMemo(() => {
     if (!movie.poster_path) {
       return null;
@@ -111,19 +99,18 @@ const TrailerCard = ({
   }, [movie.poster_path]);
 
   const onStateChange = useCallback(async (state: string) => {
-    if (state === "ended") {
-      setIsPlaying(false);
+    if (state === VideoStatus.ENDED) {
       setProgress(0);
       playerRef.current?.seekTo(0, true);
     }
-    if (state === "playing") {
+    if (state === VideoStatus.PLAYING) {
       setIsPlaying(true);
       const fullDuration = await playerRef.current?.getDuration();
       if (fullDuration) {
         setDuration(fullDuration);
       }
     }
-    if (state === "paused") {
+    if (state === VideoStatus.PAUSED) {
       setIsPlaying(false);
     }
   }, []);
@@ -136,11 +123,7 @@ const TrailerCard = ({
     playerRef.current?.seekTo(value, true);
     setProgress(value);
     // Timeout to prevent stuttering after seek
-    setTimeout(() => setIsSeeking(false), 500);
-  }, []);
-
-  const toggleIsExpanded = useCallback(() => {
-    setIsExpanded((prev) => !prev);
+    setTimeout(() => setIsSeeking(false), COMMON_NUMBERS.afterSeekTimeout);
   }, []);
 
   if (status === StateStatus.LOADING && movies.length === 0) {
@@ -197,47 +180,58 @@ const TrailerCard = ({
           gutters.padding_MEDIUM,
         ]}
       >
-        <View style={[layout.row, layout.itemsEnd, gutters.gap_MEDIUM]}>
-          <View style={[borders.roundedTop_8, layout.hideOverflow]}>
-            <FastImage
-              resizeMode={FastImage.resizeMode.cover}
-              source={{
-                priority: FastImage.priority.high,
-                uri: moviePoster || "https://via.placeholder.com/500",
-              }}
-              style={[styles.moviePoster]}
-            />
-          </View>
+        <View style={[gutters.gap_MEDIUM, gutters.marginBottom_LARGE]}>
+          <Text style={[fonts.white, fonts.size_LG_BeVietnamProBold]}>
+            {movieTitle}
+          </Text>
 
-          <View
-            style={[layout.itemsStart, layout.flexShrink_1, gutters.gap_TINY]}
-          >
-            <Text style={[fonts.white, fonts.size_LG_BeVietnamProBold]}>
-              {movieTitle}
-            </Text>
+          <View style={[layout.row, layout.itemsStart, gutters.gap_MEDIUM]}>
+            <View style={[borders.rounded_8, layout.hideOverflow]}>
+              <FastImage
+                resizeMode={FastImage.resizeMode.cover}
+                source={{
+                  priority: FastImage.priority.high,
+                  uri: moviePoster || "https://via.placeholder.com/500",
+                }}
+                style={[styles.moviePoster]}
+              />
+            </View>
 
-            <Pressable onPress={toggleIsExpanded}>
-              <Text style={[fonts.white, fonts.size_SM_BeVietnamProRegular]}>
-                {movieOverview}
-                {needsTruncation && (
-                  <Text style={[fonts.size_SM_BeVietnamProBold]}>
-                    {isExpanded ? ` ${t("feed:less")}` : ` ${t("feed:more")}`}
-                  </Text>
-                )}
+            <View style={[layout.flexShrink_1, gutters.gap_SMALL]}>
+              <Text
+                numberOfLines={4}
+                style={[
+                  fonts.white,
+                  fonts.size_SM_BeVietnamProRegular,
+                  layout.lineHeightMD,
+                ]}
+              >
+                {movie.overview}
               </Text>
-            </Pressable>
+              <View style={[layout.row, layout.fullWidth, gutters.gap_SMALL]}>
+                <Button
+                  buttonStyle={[layout.flex_1]}
+                  isSecondary
+                  title={t("feed:full_screen")}
+                />
+                <Button
+                  buttonStyle={[layout.flex_1]}
+                  title={t("feed:see_more")}
+                />
+              </View>
+            </View>
           </View>
         </View>
 
         <Slider
-          maximumTrackTintColor="rgba(255, 255, 255, 0.5)"
+          maximumTrackTintColor={colors.gray400}
           maximumValue={duration}
-          minimumTrackTintColor="#FFFFFF"
+          minimumTrackTintColor={colors.primary400}
           minimumValue={0}
           onSlidingComplete={onSlideComplete}
           onSlidingStart={onSlideStart}
-          style={styles.slider}
-          thumbTintColor="#FFFFFF"
+          style={[layout.fullWidth]}
+          thumbTintColor={colors.primary400}
           value={progress}
         />
       </View>
@@ -253,13 +247,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   moviePoster: {
-    height: verticalScale(150),
-    width: moderateScale(100),
-  },
-  slider: {
-    height: 40,
-    marginTop: 10,
-    width: "100%",
+    height: verticalScale(132),
+    width: moderateScale(88),
   },
   touchBlocker: {
     ...StyleSheet.absoluteFillObject,

@@ -15,6 +15,7 @@ interface ButtonProps {
   buttonStyle?: StyleProp<ViewStyle>;
   disabled?: boolean;
   icon?: string;
+  isSecondary?: boolean;
   onPress?: () => void;
   title?: string;
 }
@@ -23,6 +24,7 @@ const Button = ({
   buttonStyle = {},
   disabled = false,
   icon = "",
+  isSecondary = false,
   onPress = () => {},
   title = "",
 }: ButtonProps) => {
@@ -60,9 +62,13 @@ const Button = ({
           layout.fullWidth,
           layout.itemsCenter,
           layout.justifyCenter,
-          backgrounds.primary500,
-          gutters.padding_MEDIUM,
+          isSecondary ? backgrounds.transparent : backgrounds.primary400,
+          gutters.paddingHorizontal_LARGE,
+          gutters.paddingTop_TINY,
+          gutters.paddingBottom_XSMALL,
           borders.rounded_16,
+          isSecondary && borders.primary400,
+          isSecondary && borders.w_1,
           icon && !title && components.elementXl,
           animatedStyle,
           buttonStyle,
@@ -70,7 +76,14 @@ const Button = ({
       >
         {icon && <IconByVariant path={icon} style={[components.elementMd]} />}
         {title && (
-          <Text style={[fonts.white, fonts.size_SM_BeVietnamProSemiBold]}>
+          <Text
+            style={[
+              isSecondary ? fonts.primary400 : fonts.gray400,
+              isSecondary
+                ? fonts.size_SM_BeVietnamProRegular
+                : fonts.size_SM_BeVietnamProSemiBold,
+            ]}
+          >
             {title}
           </Text>
         )}

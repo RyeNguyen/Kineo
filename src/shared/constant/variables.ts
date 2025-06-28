@@ -11,7 +11,12 @@ export const ICONS = {
   iconBack: "iconBack",
   iconEye: "iconEye",
   iconEyeHidden: "iconEyeHidden",
+  iconFilter: "iconFilter",
+  iconMovie: "iconMovie",
   iconNextWhite: "iconNextWhite",
+  iconPlay: "iconPlay",
+  iconProfile: "iconProfile",
+  iconSearch: "iconSearch",
 };
 
 export const MASCOT_SIZE = {
@@ -20,12 +25,14 @@ export const MASCOT_SIZE = {
 };
 
 export const COMMON_NUMBERS = {
+  afterSeekTimeout: 500,
   maxBrowsingPages: 500,
   maxNameLength: 20,
   maxVideoWidth: 400,
   minNameLength: 3,
   minPasswordLength: 6,
   overviewCharacterLimit: 150,
+  pollingTime: 500,
   voteCount: 200,
   youtubeAspectRatio: 16 / 9,
 };
