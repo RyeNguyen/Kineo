@@ -3,9 +3,13 @@ import { z } from "zod";
 export const movieSchema = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().optional(),
+  first_air_date: z.string().optional(),
   genre_ids: z.array(z.number()).optional(),
   id: z.number().optional(),
+  name: z.string().optional(),
+  origin_country: z.array(z.string()).optional(),
   original_language: z.string().optional(),
+  original_name: z.string().optional(),
   original_title: z.string().optional(),
   overview: z.string().optional(),
   popularity: z.number().optional(),

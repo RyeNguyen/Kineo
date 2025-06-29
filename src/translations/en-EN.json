@@ -68,5 +68,13 @@
   "feed": {
     "see_more": "See more",
     "full_screen": "Full screen"
+  },
+  "filter": {
+    "clear": "Clear all",
+    "apply": "Apply filters",
+    "types": "Types",
+    "movies": "Movies",
+    "tv_shows": "TV Shows",
+    "voting_score": "Voting score"
   }
 }

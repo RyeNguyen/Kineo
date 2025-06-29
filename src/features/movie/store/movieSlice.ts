@@ -1,15 +1,32 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
-import { StateStatus, TabCategory } from "@/config";
+import { StateStatus, TabCategory, VideoType } from "@/config";
 import type { Movie } from "../models/movie.model";
+import { t } from "i18next";
 
 export interface MovieWithMetadata extends Movie {
   trailerKey?: string;
 }
 
+export interface MovieType {
+  id: number;
+  name: string;
+  value: VideoType;
+}
+
+export interface MovieScore {
+  id: number;
+  name: string;
+  value: number;
+}
+
 export interface MovieState {
   activeTab: TabCategory;
+  filter: {
+    score?: MovieScore;
+    type: MovieType;
+  };
   pagination: {
     [key in TabCategory]: {
       currentPage: number;
@@ -39,6 +56,13 @@ const setupInitialPagination = (): MovieState["pagination"] => {
 
 const initialState: MovieState = {
   activeTab: TabCategory.DISCOVER,
+  filter: {
+    type: {
+      id: 1,
+      name: t("filter:movies"),
+      value: VideoType.MOVIE,
+    },
+  },
   pagination: setupInitialPagination(),
 };
 
@@ -51,6 +75,12 @@ const movieSlice = createSlice({
       if (!currentCategory.fetchedPages.includes(action.payload)) {
         currentCategory.fetchedPages.push(action.payload);
       }
+    },
+    clearAllMovieState: (state) => {
+      Object.assign(state.pagination, initialState.pagination);
+    },
+    clearFilters: (state) => {
+      Object.assign(state.filter, initialState.filter);
     },
     clearMovieState: (state) => {
       Object.assign(state.pagination[state.activeTab], {
@@ -95,11 +125,34 @@ const movieSlice = createSlice({
     setTotalPages: (state, action: PayloadAction<number>) => {
       state.pagination[state.activeTab].totalPages = action.payload;
     },
+    updateMovieFilters: (
+      state,
+      action: PayloadAction<Record<string, MovieScore | MovieType>>
+    ) => {
+      Object.keys(action.payload).forEach((key: string) => {
+        const filterKey = key as keyof typeof state.filter;
+
+        if (key !== "type") {
+          if (
+            state.filter[filterKey] &&
+            state.filter[filterKey]?.value === action.payload[filterKey].value
+          ) {
+            delete state.filter[filterKey];
+          } else {
+            Object.assign(state.filter, action.payload);
+          }
+        } else {
+          Object.assign(state.filter, action.payload);
+        }
+      });
+    },
   },
 });
 
 export const {
   addFetchedPage,
+  clearAllMovieState,
+  clearFilters,
   clearMovieState,
   getDiscoveredMovies,
   getDiscoveredMoviesFailure,
@@ -108,5 +161,6 @@ export const {
   setActiveTab,
   setCurrentPage,
   setTotalPages,
+  updateMovieFilters,
 } = movieSlice.actions;
 export default movieSlice.reducer;

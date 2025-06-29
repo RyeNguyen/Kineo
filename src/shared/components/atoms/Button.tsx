@@ -1,5 +1,5 @@
 import React from "react";
-import type { StyleProp, ViewStyle } from "react-native";
+import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import { Text, TouchableOpacity } from "react-native";
 
 import useTheme from "@/shared/hook/useTheme";
@@ -13,6 +13,7 @@ import { BOUNCE_PRESS_SCALE, SPRING_CONFIG } from "@/animations";
 
 interface ButtonProps {
   buttonStyle?: StyleProp<ViewStyle>;
+  buttonTextStyle?: StyleProp<TextStyle | ViewStyle>;
   disabled?: boolean;
   icon?: string;
   isSecondary?: boolean;
@@ -22,6 +23,7 @@ interface ButtonProps {
 
 const Button = ({
   buttonStyle = {},
+  buttonTextStyle = {},
   disabled = false,
   icon = "",
   isSecondary = false,
@@ -82,6 +84,7 @@ const Button = ({
               isSecondary
                 ? fonts.size_SM_BeVietnamProRegular
                 : fonts.size_SM_BeVietnamProSemiBold,
+              buttonTextStyle,
             ]}
           >
             {title}

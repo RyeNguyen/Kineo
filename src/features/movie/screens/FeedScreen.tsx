@@ -1,5 +1,5 @@
 import type { LayoutChangeEvent } from "react-native";
-import { RefreshControl, View } from "react-native";
+import { Pressable, RefreshControl, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
 import type { Paths } from "@/navigation/paths";
@@ -17,6 +17,8 @@ import type {
   MovieWithMetadata,
 } from "@/features/movie/store/movieSlice";
 import {
+  clearAllMovieState,
+  clearFilters,
   getDiscoveredMovies,
   refreshMovies,
   setActiveTab,
@@ -24,19 +26,28 @@ import {
 import { StateStatus } from "@/config";
 import type { TabCategory } from "@/shared/constant";
 import { DEVICE_SIZE, ICONS } from "@/shared/constant";
-import { IconByVariant, Loader } from "@/shared/components/atoms";
+import { Button, IconByVariant, Loader } from "@/shared/components/atoms";
+import type { BaseBottomSheetRef } from "@/shared/components/atoms/BaseBottomSheet";
+import BaseBottomSheet from "@/shared/components/atoms/BaseBottomSheet";
+import FilterSheetContent from "../components/FilterSheetContent";
+import { t } from "i18next";
+import type { BottomSheetDefaultFooterProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetFooter/types";
+import { BottomSheetFooter } from "@gorhom/bottom-sheet";
 
 function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
-  const { backgrounds, colors, gutters, layout } = useTheme();
+  const { backgrounds, colors, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
   const { activeTab, pagination } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
+  console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
   const { movies, status } = pagination[activeTab];
 
   const [visibleItemIndex, setVisibleItemIndex] = useState<number>(0);
   const [layoutHeight, setLayoutHeight] = useState<number>(0);
+
+  const filterSheetRef = useRef<BaseBottomSheetRef>(null);
 
   const isRefreshing = status === StateStatus.LOADING && movies.length > 0;
 
@@ -79,6 +90,80 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const handleRefresh = useCallback(() => {
     dispatch(refreshMovies());
   }, [dispatch]);
+
+  const handleOpenFilters = useCallback(() => {
+    filterSheetRef.current?.onExpand();
+  }, []);
+
+  const handleCloseFilters = useCallback(() => {
+    filterSheetRef.current?.close();
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    dispatch(clearAllMovieState());
+    dispatch(clearFilters());
+    dispatch(getDiscoveredMovies());
+    filterSheetRef.current?.close();
+  }, [dispatch]);
+
+  const handleApplyFilters = useCallback(() => {
+    dispatch(clearAllMovieState());
+    dispatch(getDiscoveredMovies());
+    filterSheetRef.current?.close();
+  }, [dispatch]);
+
+  const renderBottomSheetFooter = useCallback(
+    (props: BottomSheetDefaultFooterProps & React.JSX.IntrinsicAttributes) => {
+      return (
+        <BottomSheetFooter {...props} bottomInset={0}>
+          <View
+            style={[
+              backgrounds.gray800,
+              layout.row,
+              layout.fullWidth,
+              layout.itemsCenter,
+              gutters.gap_LARGE,
+              gutters.padding_MEDIUM,
+            ]}
+          >
+            <Pressable onPress={handleClearFilters}>
+              <Text
+                style={[fonts.size_SM_BeVietnamProSemiBold, fonts.primary400]}
+              >
+                {t("filter:clear")}
+              </Text>
+            </Pressable>
+
+            <View style={[layout.flex_1]}>
+              <Button
+                buttonStyle={[
+                  gutters.paddingTop_SMALL,
+                  gutters.paddingBottom_MEDIUM,
+                ]}
+                onPress={handleApplyFilters}
+                title={t("filter:apply")}
+              />
+            </View>
+          </View>
+        </BottomSheetFooter>
+      );
+    },
+    [
+      backgrounds.gray800,
+      fonts.primary400,
+      fonts.size_SM_BeVietnamProSemiBold,
+      gutters.gap_LARGE,
+      gutters.paddingBottom_MEDIUM,
+      gutters.paddingTop_SMALL,
+      gutters.padding_MEDIUM,
+      handleApplyFilters,
+      handleClearFilters,
+      layout.flex_1,
+      layout.fullWidth,
+      layout.itemsCenter,
+      layout.row,
+    ]
+  );
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { height } = event.nativeEvent.layout;
@@ -153,8 +238,22 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
         ]}
       >
         <FeedTabs activeTab={activeTab} onTabPress={handleTabPress} />
-        <IconByVariant path={ICONS.iconFilter} />
+        <Pressable onPress={handleOpenFilters}>
+          <IconByVariant path={ICONS.iconFilter} />
+        </Pressable>
       </View>
+
+      <BaseBottomSheet
+        onClose={handleCloseFilters}
+        ref={filterSheetRef}
+        renderFooterModal={renderBottomSheetFooter}
+        scrollEnable
+        snapPoints={["90%"]}
+        style={[backgrounds.gray800]}
+      >
+        {/* The content of the sheet will be a new component */}
+        <FilterSheetContent onClose={handleCloseFilters} />
+      </BaseBottomSheet>
     </SafeScreen>
   );
 }

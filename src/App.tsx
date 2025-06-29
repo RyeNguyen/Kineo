@@ -10,7 +10,7 @@ import "@/translations";
 import type { AuthState } from "./features/auth/store/authSlice";
 
 import NetInfo from "@react-native-community/netinfo";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
@@ -21,6 +21,8 @@ import { setNetworkStatus } from "./features/network/store/networkSlice";
 import { persistor, store } from "./redux/store";
 import "react-native-reanimated";
 import "react-native-gesture-handler";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { PortalProvider } from "@gorhom/portal";
 
 export const storage = new MMKV();
 
@@ -51,14 +53,16 @@ const MainApp = () => {
   return (
     <GestureHandlerRootView>
       <ThemeProvider storage={storage}>
-        <NetworkListener />
-        <NetworkBanner />
-        <ApplicationNavigator />
-        <ErrorModal
-          errorMessage="Token expired"
-          onClose={onCloseErrorModal}
-          visible={!!expiredToken}
-        />
+        <PortalProvider>
+          <NetworkListener />
+          <NetworkBanner />
+          <ApplicationNavigator />
+          <ErrorModal
+            errorMessage="Token expired"
+            onClose={onCloseErrorModal}
+            visible={!!expiredToken}
+          />
+        </PortalProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );

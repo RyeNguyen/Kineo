@@ -96,8 +96,8 @@ const TrailerCard = ({
   }, [isPlaying, isSeeking]);
 
   const movieTitle = useMemo(() => {
-    return `${movie.title} (${getYear(movie.release_date || Date.now().toString())})`;
-  }, [movie.title, movie.release_date]);
+    return `${movie.title || movie.name} (${getYear(movie.release_date || movie.first_air_date || Date.now().toString())})`;
+  }, [movie.title, movie.name, movie.release_date, movie.first_air_date]);
 
   const moviePoster = useMemo(() => {
     if (!movie.poster_path) {

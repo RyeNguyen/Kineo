@@ -18,10 +18,10 @@ export const getDiscoveredMoviesApi = async ({
 };
 
 export const getMovieTrailersApi = async (
-  movieId: number
+  endpoint: string
 ): Promise<unknown> => {
   try {
-    const response = await api.get(`/movie/${movieId}/videos`);
+    const response = await api.get(`${endpoint}/videos`);
 
     return response.data;
   } catch (error) {

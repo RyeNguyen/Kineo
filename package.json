@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5",
+    "@gorhom/portal": "^1.0.14",
     "@hookform/resolvers": "^5.0.1",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-community/slider": "^4.5.7",

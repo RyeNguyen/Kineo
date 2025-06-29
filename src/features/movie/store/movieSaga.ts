@@ -22,7 +22,7 @@ import {
   setTotalPages,
 } from "./movieSlice";
 import { getDiscoveredMoviesApi, getMovieTrailersApi } from "../services";
-import { MovieEndPoint, TabCategory } from "@/shared/constant";
+import { MovieEndPoint, TabCategory, VideoType } from "@/shared/constant";
 import { COMMON_NUMBERS } from "@/shared/constant";
 
 const getMovieState = (state: { movie: MovieState }) => state.movie;
@@ -31,9 +31,14 @@ function* getMovieTrailerRequest(
   movie: Movie
 ): Generator<unknown, Movie, MovieWithMetadata> {
   try {
+    const { filter } = (yield select(getMovieState)) as unknown as MovieState;
+    const { type } = filter;
+
+    const endpoint = `/${type.value}/${movie.id}`;
+
     const videosResponse = (yield callApiWithNetworkCheck(
       getMovieTrailersApi,
-      movie.id
+      endpoint
     )) as MovieVideoResponse;
 
     const trailer = (videosResponse.results || []).find(
@@ -57,45 +62,49 @@ function* getDiscoveredMoviesRequest(
 ): Generator<unknown, void, unknown> {
   try {
     // Get the current state from the store
-    const { activeTab, pagination } = (yield select(
+    const { activeTab, filter, pagination } = (yield select(
       getMovieState
     )) as MovieState;
     const { currentPage, fetchedPages, totalPages } = pagination[activeTab];
+    const { score, type } = filter;
 
     let endpoint = "";
 
     switch (activeTab) {
       case TabCategory.POPULAR:
-        endpoint = MovieEndPoint.POPULAR;
+        endpoint = `${type.value}${MovieEndPoint.POPULAR}`;
         break;
       case TabCategory.TOP_RATED:
-        endpoint = MovieEndPoint.TOP_RATED;
+        endpoint = `${type.value}${MovieEndPoint.TOP_RATED}`;
         break;
       case TabCategory.UPCOMING:
-        endpoint = MovieEndPoint.UPCOMING;
+        endpoint = `${type.value}${type.value === VideoType.MOVIE ? MovieEndPoint.UPCOMING : MovieEndPoint.ON_THE_AIR}`;
         break;
       case TabCategory.DISCOVER:
       default:
-        endpoint = MovieEndPoint.DISCOVER;
+        endpoint = `${MovieEndPoint.DISCOVER}/${type.value}`;
         break;
+    }
+
+    if (score) {
+      endpoint += `?vote_average.gte=${score.value}`;
     }
 
     let pagesToUse = totalPages;
 
     // --- LOGIC FOR THE VERY FIRST FETCH ---
     if (pagesToUse === 0) {
-      const firstResponse =
-        endpoint === MovieEndPoint.DISCOVER
-          ? ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
-              endpoint,
-              page: 1,
-              sort_by: "popularity.desc",
-              "vote_count.gte": COMMON_NUMBERS.voteCount,
-            })) as MovieResponse)
-          : ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
-              endpoint,
-              page: 1,
-            })) as MovieResponse);
+      const firstResponse = endpoint.includes(MovieEndPoint.DISCOVER)
+        ? ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+            endpoint,
+            page: 1,
+            sort_by: "popularity.desc",
+            "vote_count.gte": COMMON_NUMBERS.voteCount,
+          })) as MovieResponse)
+        : ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+            endpoint,
+            page: 1,
+          })) as MovieResponse);
       pagesToUse = Math.min(
         firstResponse.total_pages || 0,
         COMMON_NUMBERS.maxBrowsingPages
@@ -105,7 +114,7 @@ function* getDiscoveredMoviesRequest(
 
     let moviesResponse: MovieResponse = {};
 
-    if (endpoint === MovieEndPoint.DISCOVER) {
+    if (endpoint.includes(MovieEndPoint.DISCOVER)) {
       // --- LOGIC TO FIND A NEW, UNIQUE RANDOM PAGE ---
       let randomPage;
       do {

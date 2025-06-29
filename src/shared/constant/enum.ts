@@ -32,3 +32,8 @@ export enum VideoStatus {
   PAUSED = "paused",
   PLAYING = "playing",
 }
+
+export enum VideoType {
+  MOVIE = "movie",
+  TV = "tv",
+}

@@ -18,7 +18,7 @@ import React, {
   useState,
 } from "react";
 import type { LayoutChangeEvent } from "react-native";
-import { Text, TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Extrapolation,
@@ -28,11 +28,12 @@ import Animated, {
   useAnimatedStyle,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Portal } from "@gorhom/portal";
 
 import Button from "./Button";
-import IconByVariant from "./IconByVariant";
 import { useTheme } from "../../hook";
-import { ICONS } from "../../constant";
+import layout from "@/config/theme/layout";
 
 type BaseBottomSheetProps = {
   actionLabel?: string;
@@ -73,7 +74,7 @@ const BaseBottomSheetInner = (
   }: BaseBottomSheetProps,
   ref: React.Ref<BaseBottomSheetRef>
 ) => {
-  const { backgrounds, borders, fonts, gutters, layout } = useTheme();
+  const { backgrounds, borders, gutters } = useTheme();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 
@@ -105,7 +106,7 @@ const BaseBottomSheetInner = (
           opacity: interpolate(
             currentIndex,
             [-1, 0],
-            [0, 0.75],
+            [0, 0.5],
             Extrapolation.CLAMP
           ),
           pointerEvents: isHidden ? "none" : "auto",
@@ -140,7 +141,7 @@ const BaseBottomSheetInner = (
             exiting={FadeOut}
             style={[
               containerStyle,
-              { backgroundColor: "rgba(0,0,0,0.6)" },
+              { backgroundColor: "rgba(0,0,0,0.5)" },
               style,
             ]}
           />
@@ -181,8 +182,7 @@ const BaseBottomSheetInner = (
           style={[
             gutters.paddingHorizontal_MEDIUM,
             gutters.paddingTop_SMALL,
-            // components.shadowBox5Inverted,
-            backgrounds.white,
+            backgrounds.gray800,
           ]}
         >
           <Button onPress={onSubmit} title={actionLabel || ""} />
@@ -191,7 +191,7 @@ const BaseBottomSheetInner = (
     ),
     [
       actionLabel,
-      backgrounds.white,
+      backgrounds.gray800,
       gutters.paddingHorizontal_MEDIUM,
       gutters.paddingTop_SMALL,
       onSubmit,
@@ -206,60 +206,49 @@ const BaseBottomSheetInner = (
   const insets = useSafeAreaInsets();
 
   return (
-    <BottomSheet
-      backdropComponent={renderBackdrop}
-      enableContentPanningGesture={false}
-      enableDynamicSizing={false}
-      enableHandlePanningGesture={false}
-      enablePanDownToClose={false}
-      // footerComponent={renderFooterModal ? renderFooterModal : renderFooter}
-      handleComponent={null}
-      index={-1}
-      ref={bottomSheetRef}
-      snapPoints={[contentHeight]}
-      topInset={insets.top}
-      {...otherProps}
-    >
-      <BottomSheetView
-        onLayout={handleCalulateLayout}
-        style={[
-          backgrounds.background50,
-          gutters.padding_MEDIUM,
-          gutters.paddingBottom_LARGE,
-          gutters.gap_MEDIUM,
-          borders.roundedTop_16,
-        ]}
+    <Portal>
+      <BottomSheet
+        backdropComponent={renderBackdrop}
+        enableContentPanningGesture={false}
+        enableDynamicSizing={false}
+        enableHandlePanningGesture={false}
+        enablePanDownToClose={false}
+        footerComponent={renderFooterModal ? renderFooterModal : renderFooter}
+        handleComponent={null}
+        index={-1}
+        ref={bottomSheetRef}
+        snapPoints={snapPoints.length > 0 ? snapPoints : [contentHeight]}
+        topInset={insets.top}
+        {...otherProps}
       >
-        {/* Header */}
-        {renderHeader ? (
-          renderHeader
-        ) : (
-          <View style={[layout.row, layout.itemsCenter, layout.justifyBetween]}>
-            <Text
-              style={[fonts.size_MD_BeVietnamProSemiBold, fonts.primary500]}
+        <BottomSheetView
+          onLayout={handleCalulateLayout}
+          style={[
+            layout.flex_1,
+            backgrounds.gray800,
+            gutters.padding_MEDIUM,
+            gutters.paddingBottom_LARGE,
+            gutters.gap_MEDIUM,
+            borders.roundedTop_16,
+          ]}
+        >
+          {/* Header */}
+          {renderHeader}
+
+          {/* Body */}
+          {!scrollEnable ? (
+            children
+          ) : (
+            <BottomSheetScrollView
+              contentContainerStyle={[gutters.paddingBottom_COLOSSAL]}
+              showsVerticalScrollIndicator={false}
             >
-              {title}
-            </Text>
-
-            <TouchableOpacity onPress={closeModal}>
-              <IconByVariant path={ICONS.iconClose} />
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Body */}
-        {!scrollEnable ? (
-          children
-        ) : (
-          <BottomSheetScrollView
-            contentContainerStyle={[gutters.paddingBottom_COLOSSAL]}
-            showsVerticalScrollIndicator={false}
-          >
-            {children}
-          </BottomSheetScrollView>
-        )}
-      </BottomSheetView>
-    </BottomSheet>
+              {children}
+            </BottomSheetScrollView>
+          )}
+        </BottomSheetView>
+      </BottomSheet>
+    </Portal>
   );
 };
 const BaseBottomSheet = forwardRef<BaseBottomSheetRef, BaseBottomSheetProps>(
