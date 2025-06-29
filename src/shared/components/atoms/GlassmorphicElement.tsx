@@ -1,16 +1,16 @@
 // src/shared/components/atoms/GlassmorphismButton.tsx
 
-import React from "react";
-import type { ViewStyle } from "react-native";
+import React, { useMemo, useState } from "react";
+import type { LayoutChangeEvent, ViewStyle } from "react-native";
 import { StyleSheet, View } from "react-native";
 // 1. Import BlurView from the new library
 // eslint-disable-next-line import/no-extraneous-dependencies
 import {
   BackdropBlur,
   Canvas,
-  LinearGradient,
+  Fill,
   RoundedRect,
-  vec,
+  Skia,
 } from "@shopify/react-native-skia";
 import { useTheme } from "@/shared/hook";
 
@@ -23,60 +23,73 @@ const GlassmorphicElement = ({
   children,
   extraStyles = {},
 }: GlassmorphicElementProps) => {
-  const { borders, colors, layout } = useTheme();
+  const { borders, layout } = useTheme();
+
+  const [layoutSize, setLayoutSize] = useState<{
+    height: number;
+    width: number;
+  }>({
+    height: 0,
+    width: 0,
+  });
+
+  const onLayout = (event: LayoutChangeEvent) => {
+    const { height, width } = event.nativeEvent.layout;
+    setLayoutSize({ height, width });
+  };
+
+  const radius = useMemo(() => layoutSize.width / 2, [layoutSize.width]);
+
+  const clipPath = useMemo(() => {
+    if (!layoutSize.width || !layoutSize.height) {
+      return Skia.RRectXY(Skia.XYWHRect(0, 0, 0, 0), 0, 0);
+    }
+    return Skia.RRectXY(
+      Skia.XYWHRect(0, 0, layoutSize.width, layoutSize.height),
+      radius,
+      radius
+    );
+  }, [layoutSize, radius]);
 
   return (
     <View
+      onLayout={onLayout}
       style={[
         layout.itemsCenter,
+        layout.relative,
         layout.justifyCenter,
         layout.hideOverflow,
-        borders.rounded_16,
+        borders.rounded_100,
         extraStyles,
       ]}
     >
-      <Canvas style={layout.flex_1}>
-        <BackdropBlur
-          clip={{ height: 40, rx: 16, width: 40, x: 0, y: 0 }}
-          intensity={25}
-        />
-
-        <RoundedRect
-          color="rgba(255, 255, 255, 0.15)" // A semi-transparent white for the glass [00:03:45]
-          height={40}
-          r={16}
-          width={40}
-          x={0}
-          y={0}
-        />
-
-        <RoundedRect
-          height={39}
-          r={16}
-          strokeWidth={1}
-          style="stroke"
-          width={39}
-          x={0.5}
-          y={0.5}
+      {layoutSize.width > 0 && (
+        <Canvas
+          style={[
+            layout.absolute,
+            layout.top0,
+            layout.right0,
+            layout.bottom0,
+            layout.left0,
+            StyleSheet.absoluteFillObject,
+          ]}
         >
-          <LinearGradient
-            colors={["rgba(255, 255, 255, 0.5)", "rgba(255, 255, 255, 0.1)"]}
-            end={vec(40, 40)}
-            start={vec(0, 0)}
-          />
-        </RoundedRect>
-      </Canvas>
-      <View
-        style={[
-          layout.itemsCenter,
-          layout.justifyCenter,
-          layout.hideOverflow,
-          borders.rounded_16,
-          extraStyles,
-        ]}
-      >
-        {children}
-      </View>
+          <BackdropBlur blur={40} clip={clipPath}>
+            <Fill color="rgba(82, 77, 77, 0.6)" />
+          </BackdropBlur>
+
+          {/* <RoundedRect
+            color="rgba(82, 77, 77, 0.6)"
+            height={layoutSize.height}
+            r={radius}
+            width={layoutSize.width}
+            x={0}
+            y={0}
+          /> */}
+        </Canvas>
+      )}
+
+      {children}
     </View>
   );
 };

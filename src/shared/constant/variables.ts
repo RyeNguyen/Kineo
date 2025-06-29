@@ -33,6 +33,7 @@ export const COMMON_NUMBERS = {
   minPasswordLength: 6,
   overviewCharacterLimit: 150,
   pollingTime: 500,
+  seekingTime: 5,
   voteCount: 200,
   youtubeAspectRatio: 16 / 9,
 };

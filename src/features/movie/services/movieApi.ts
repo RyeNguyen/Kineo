@@ -1,15 +1,5 @@
-import { MovieEndPoint } from "@/config";
 import api from "../../../services/axiosConfig";
 import type { MovieResponse } from "../models/movie.model";
-
-export const getPopularMoviesApi = async (): Promise<unknown> => {
-  try {
-    const response = await api.get("/movie/popular?page=1&include_video=true");
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 export const getDiscoveredMoviesApi = async ({
   endpoint,

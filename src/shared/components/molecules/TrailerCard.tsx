@@ -145,14 +145,14 @@ const TrailerCard = ({
   }, []);
 
   const seekBackward = useCallback(() => {
-    const newTime = Math.max(0, progress - 10); // Prevents going below 0
+    const newTime = Math.max(0, progress - COMMON_NUMBERS.seekingTime); // Prevents going below 0
     playerRef.current?.seekTo(newTime, true);
     setProgress(newTime);
   }, [progress]);
 
   const seekForward = useCallback(() => {
     // We can add a check to not seek beyond the duration if we want
-    const newTime = progress + 10;
+    const newTime = progress + COMMON_NUMBERS.seekingTime;
     playerRef.current?.seekTo(newTime, true);
     setProgress(newTime);
   }, [progress]);
@@ -237,7 +237,7 @@ const TrailerCard = ({
         </TapGestureHandler>
       </View>
 
-      {/* <Pressable
+      <Pressable
         onPress={togglePlaying}
         style={[
           layout.z1,
@@ -248,12 +248,12 @@ const TrailerCard = ({
       >
         {!isPlaying && (
           <GlassmorphicElement
-            extraStyles={[gutters.padding_COLOSSAL, borders.rounded_100]}
+            extraStyles={[gutters.padding_SMALL, borders.rounded_100]}
           >
             <IconByVariant path={ICONS.iconPlay} />
           </GlassmorphicElement>
         )}
-      </Pressable> */}
+      </Pressable>
 
       <View
         style={[
