@@ -21,13 +21,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 import type { TapGestureHandlerStateChangeEvent } from "react-native-gesture-handler";
 import {
@@ -39,7 +33,7 @@ import Slider from "@react-native-community/slider";
 import { useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { moderateScale, verticalScale } from "@/shared/utils";
-import { Button, GlassmorphicElement, IconByVariant } from "../atoms";
+import { Button, GlassmorphicElement, IconByVariant, Loader } from "../atoms";
 import Config from "react-native-config";
 
 interface TrailerCardProps {
@@ -184,10 +178,9 @@ const TrailerCard = ({
           layout.justifyCenter,
           backgrounds.black,
           { height: cardHeight },
-          styles.loaderContainer,
         ]}
       >
-        <ActivityIndicator color="#fff" size="large" />
+        <Loader size={64} />
       </View>
     );
   }
@@ -217,9 +210,9 @@ const TrailerCard = ({
         width={VIDEO_WIDTH}
       />
 
-      <View style={styles.touchBlocker} />
+      <View style={[layout.z1, StyleSheet.absoluteFillObject]} />
 
-      <View style={[layout.row, layout.flex_1, styles.touchableOverlay]}>
+      <View style={[layout.row, layout.flex_1, StyleSheet.absoluteFillObject]}>
         {/* Left Side for Rewind */}
         <TapGestureHandler
           numberOfTaps={2}
@@ -243,7 +236,7 @@ const TrailerCard = ({
           layout.z1,
           layout.itemsCenter,
           layout.justifyCenter,
-          styles.touchableOverlay,
+          StyleSheet.absoluteFillObject,
         ]}
       >
         {!isPlaying && (
@@ -325,12 +318,6 @@ const TrailerCard = ({
 };
 
 const styles = StyleSheet.create({
-  loaderContainer: {
-    alignItems: "center",
-    backgroundColor: "#000",
-    flex: 1,
-    justifyContent: "center",
-  },
   moviePoster: {
     height: verticalScale(132),
     width: moderateScale(88),

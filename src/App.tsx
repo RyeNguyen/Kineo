@@ -19,6 +19,8 @@ import ThemeProvider from "./config/theme/ThemeProvider/ThemeProvider";
 import { logoutRequest } from "./features/auth/store/authSlice";
 import { setNetworkStatus } from "./features/network/store/networkSlice";
 import { persistor, store } from "./redux/store";
+import "react-native-reanimated";
+import "react-native-gesture-handler";
 
 export const storage = new MMKV();
 

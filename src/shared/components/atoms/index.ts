@@ -6,6 +6,7 @@ export { default as ErrorModal } from "./ErrorModal";
 export { default as GlassmorphicElement } from "./GlassmorphicElement";
 export { default as IconByVariant } from "./IconByVariant";
 export { default as Input } from "./Input";
+export { default as Loader } from "./Loader";
 export { default as Mascot } from "./Mascot";
 export { default as NetworkBanner } from "./NetworkBanner";
 export { default as Skeleton } from "./Skeleton";

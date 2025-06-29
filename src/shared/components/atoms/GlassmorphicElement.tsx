@@ -1,17 +1,9 @@
-// src/shared/components/atoms/GlassmorphismButton.tsx
-
 import React, { useMemo, useState } from "react";
 import type { LayoutChangeEvent, ViewStyle } from "react-native";
 import { StyleSheet, View } from "react-native";
 // 1. Import BlurView from the new library
 // eslint-disable-next-line import/no-extraneous-dependencies
-import {
-  BackdropBlur,
-  Canvas,
-  Fill,
-  RoundedRect,
-  Skia,
-} from "@shopify/react-native-skia";
+import { BackdropBlur, Canvas, Fill, Skia } from "@shopify/react-native-skia";
 import { useTheme } from "@/shared/hook";
 
 interface GlassmorphicElementProps {
@@ -77,15 +69,6 @@ const GlassmorphicElement = ({
           <BackdropBlur blur={40} clip={clipPath}>
             <Fill color="rgba(82, 77, 77, 0.6)" />
           </BackdropBlur>
-
-          {/* <RoundedRect
-            color="rgba(82, 77, 77, 0.6)"
-            height={layoutSize.height}
-            r={radius}
-            width={layoutSize.width}
-            x={0}
-            y={0}
-          /> */}
         </Canvas>
       )}
 

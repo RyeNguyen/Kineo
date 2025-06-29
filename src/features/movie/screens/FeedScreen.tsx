@@ -1,5 +1,5 @@
 import type { LayoutChangeEvent } from "react-native";
-import { ActivityIndicator, RefreshControl, View } from "react-native";
+import { RefreshControl, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
 import type { Paths } from "@/navigation/paths";
@@ -24,16 +24,15 @@ import {
 import { StateStatus } from "@/config";
 import type { TabCategory } from "@/shared/constant";
 import { DEVICE_SIZE, ICONS } from "@/shared/constant";
-import { IconByVariant } from "@/shared/components/atoms";
+import { IconByVariant, Loader } from "@/shared/components/atoms";
 
 function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
-  const { backgrounds, components, fonts, gutters, layout } = useTheme();
+  const { backgrounds, colors, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
   const { activeTab, pagination } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
-  console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
   const { movies, status } = pagination[activeTab];
 
   const [visibleItemIndex, setVisibleItemIndex] = useState<number>(0);
@@ -47,11 +46,14 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     }
   }, [dispatch, movies.length]);
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }) => {
-    if (viewableItems.length > 0) {
-      setVisibleItemIndex(viewableItems[0].index);
-    }
-  }, []);
+  const onViewableItemsChanged = useCallback(
+    ({ viewableItems }: { viewableItems: Array<{ index: null | number }> }) => {
+      if (viewableItems.length > 0 && viewableItems[0].index !== null) {
+        setVisibleItemIndex(viewableItems[0].index!);
+      }
+    },
+    []
+  );
 
   const viewabilityConfig = useRef({
     itemVisiblePercentThreshold: 50,
@@ -92,11 +94,17 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
         keyExtractor={(item: MovieWithMetadata, index: number) =>
           (item.id || index).toString()
         }
-        ListFooterComponent={() => {
-          return status === StateStatus.LOADING ? (
-            <ActivityIndicator color="#fff" size="large" />
-          ) : null;
-        }}
+        ListFooterComponent={
+          <View
+            style={[
+              layout.itemsCenter,
+              layout.justifyCenter,
+              { height: layoutHeight },
+            ]}
+          >
+            <Loader size={64} />
+          </View>
+        }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.8}
         onRefresh={handleRefresh}
@@ -104,10 +112,11 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
         pagingEnabled
         refreshControl={
           <RefreshControl
-            colors={["#FFFFFF"]} // For Android, makes the spinner white
+            colors={[colors.primary400]} // For Android, makes the spinner white
             onRefresh={handleRefresh}
+            progressBackgroundColor={colors.gray800}
             refreshing={isRefreshing}
-            tintColor="#FFFFFF" // For iOS, makes the spinner white
+            tintColor={colors.primary400} // For iOS, makes the spinner white
           />
         }
         refreshing={isRefreshing}
