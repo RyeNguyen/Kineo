@@ -37,6 +37,7 @@ export interface MovieState {
     score?: MovieScore;
     type: MovieType;
     voteCount?: MovieVoteCount;
+    year?: number;
   };
   genres: defaultStoreData<MovieGenre[]>;
   pagination: {
@@ -189,7 +190,10 @@ const movieSlice = createSlice({
     updateMovieFilters: (
       state,
       action: PayloadAction<
-        Record<string, MovieGenre | MovieScore | MovieType | MovieVoteCount>
+        Record<
+          string,
+          MovieGenre | MovieScore | MovieType | MovieVoteCount | number
+        >
       >
     ) => {
       Object.keys(action.payload).forEach((key: string) => {
@@ -228,6 +232,7 @@ const movieSlice = createSlice({
             }
             break;
           }
+          case "year":
           case "type":
           default: {
             {

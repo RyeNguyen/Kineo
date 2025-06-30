@@ -20,6 +20,7 @@ import {
   clearAllMovieState,
   clearFilters,
   getDiscoveredMovies,
+  getGenres,
   refreshMovies,
   setActiveTab,
 } from "@/features/movie/store/movieSlice";
@@ -38,7 +39,7 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { backgrounds, colors, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
-  const { activeTab, pagination } = useSelector(
+  const { activeTab, genres, pagination } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
   console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
@@ -92,8 +93,11 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   }, [dispatch]);
 
   const handleOpenFilters = useCallback(() => {
+    if (!genres.data.length) {
+      dispatch(getGenres());
+    }
     filterSheetRef.current?.onExpand();
-  }, []);
+  }, [dispatch, genres.data.length]);
 
   const handleCloseFilters = useCallback(() => {
     filterSheetRef.current?.close();

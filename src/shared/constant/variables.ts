@@ -45,11 +45,14 @@ export const ADVANCED_FILTER = {
   },
   criteria: {
     firstAirDate: "first_air_date",
+    firstAirDateYear: "first_air_date_year",
     popularity: "popularity",
     primaryReleaseDate: "primary_release_date",
+    primaryReleaseYear: "primary_release_year",
     sortBy: "sort_by",
     voteAverage: "vote_average",
     voteCount: "vote_count",
+    withGenres: "with_genres",
   },
   order: {
     asc: "asc",

@@ -3,8 +3,8 @@
 import { Button } from "@/shared/components/atoms";
 import { useTheme } from "@/shared/hook";
 import { t } from "i18next";
-import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import type {
   MovieScore,
@@ -12,25 +12,9 @@ import type {
   MovieType,
   MovieVoteCount,
 } from "../store/movieSlice";
-import {
-  getCountries,
-  getGenres,
-  updateMovieFilters,
-} from "../store/movieSlice";
+import { getGenres, updateMovieFilters } from "../store/movieSlice";
 import { VideoType } from "@/config";
-import type { Country, MovieGenre } from "../models/movie.model";
-// import { applyFilters, clearMoviesState } from '@/features/movie/store/movieSlice';
-
-// For simplicity, let's hardcode some genres.
-// In a real app, you would fetch these from the TMDB /genre/movie/list endpoint.
-const GENRES = [
-  { id: 28, name: "Action" },
-  { id: 12, name: "Adventure" },
-  { id: 35, name: "Comedy" },
-  { id: 18, name: "Drama" },
-  { id: 27, name: "Horror" },
-  { id: 878, name: "Science Fiction" },
-];
+import type { MovieGenre } from "../models/movie.model";
 
 const MOVIE_TYPES: MovieType[] = [
   {
@@ -86,41 +70,28 @@ const MOVIE_VOTE_COUNTS: MovieVoteCount[] = [
   },
 ];
 
+const currentYear = new Date().getFullYear();
+const YEARS = Array.from(
+  { length: currentYear - 1999 },
+  (_, i) => currentYear - i
+);
+
 interface FilterSheetContentProps {
   onClose: () => void;
 }
 
 const FilterSheetContent = ({ onClose }: FilterSheetContentProps) => {
-  const { backgrounds, borders, colors, fonts, gutters, layout } = useTheme();
+  const { backgrounds, borders, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
   const { countries, filter, genres } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
-  console.log("🚀 ~ FilterSheetContent ~ filter:", filter);
-  const { genres: filterGenres, score, type, voteCount } = filter;
-
-  // State to hold the user's selections within the sheet
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
-
-  const handleGenrePress = useCallback((genreId: number) => {
-    setSelectedGenres(
-      (prev) =>
-        prev.includes(genreId)
-          ? prev.filter((id) => id !== genreId) // Deselect if already selected
-          : [...prev, genreId] // Select if not already selected
-    );
-  }, []);
+  const { genres: filterGenres, score, type, voteCount, year } = filter;
 
   useEffect(() => {
-    if (!countries.data.length) {
-      dispatch(getCountries());
-    }
-
-    if (!genres.data.length) {
-      dispatch(getGenres());
-    }
-  }, [countries.data.length, dispatch, genres.data.length]);
+    dispatch(getGenres());
+  }, [dispatch, type.id]);
 
   return (
     <View style={[layout.flex_1, gutters.gap_MEDIUM]}>
@@ -244,6 +215,47 @@ const FilterSheetContent = ({ onClose }: FilterSheetContentProps) => {
         </View>
       </View>
 
+      {/* Years */}
+      <View style={gutters.gap_SMALL}>
+        <Text
+          style={[
+            fonts.size_SM_BeVietnamProSemiBold,
+            fonts.white,
+            layout.lineHeightMD,
+          ]}
+        >
+          {t("filter:years")}
+        </Text>
+
+        <ScrollView horizontal>
+          <View style={[layout.row, gutters.gap_SMALL]}>
+            {YEARS.map((movYear: number, index: number) => {
+              const isSelected = movYear === year;
+
+              return (
+                <View key={movYear || index}>
+                  <Button
+                    buttonStyle={[
+                      isSelected ? borders.primary400 : borders.gray100,
+                      borders.w_1,
+                      backgrounds.transparent,
+                    ]}
+                    buttonTextStyle={[
+                      isSelected ? fonts.primary400 : fonts.gray100,
+                      fonts.size_SM_BeVietnamProRegular,
+                    ]}
+                    onPress={() =>
+                      dispatch(updateMovieFilters({ year: movYear }))
+                    }
+                    title={movYear.toString()}
+                  />
+                </View>
+              );
+            })}
+          </View>
+        </ScrollView>
+      </View>
+
       {/* Genres */}
       <View style={gutters.gap_SMALL}>
         <Text
@@ -306,14 +318,5 @@ const FilterSheetContent = ({ onClose }: FilterSheetContentProps) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  genreChip: {
-    borderRadius: 20,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-});
 
 export default FilterSheetContent;
