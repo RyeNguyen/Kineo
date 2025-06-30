@@ -68,43 +68,50 @@ function* getDiscoveredMoviesRequest(
     const { currentPage, fetchedPages, totalPages } = pagination[activeTab];
     const { score, type } = filter;
 
-    let endpoint = "";
+    const endpoint = `${MovieEndPoint.DISCOVER}/${type.value}`;
+    const params: Record<string, unknown> = {};
 
     switch (activeTab) {
-      case TabCategory.POPULAR:
-        endpoint = `${type.value}${MovieEndPoint.POPULAR}`;
-        break;
       case TabCategory.TOP_RATED:
-        endpoint = `${type.value}${MovieEndPoint.TOP_RATED}`;
+        params["sort_by"] = "vote_average.desc";
+        params["vote_count.gte"] = COMMON_NUMBERS.voteCount;
         break;
       case TabCategory.UPCOMING:
-        endpoint = `${type.value}${type.value === VideoType.MOVIE ? MovieEndPoint.UPCOMING : MovieEndPoint.ON_THE_AIR}`;
+        params[
+          type.value === VideoType.MOVIE
+            ? "primary_release_date.gte"
+            : "first_air_date.gte"
+        ] = "2025-03-30";
+        params["sort_by"] =
+          type.value === VideoType.MOVIE
+            ? "primary_release_date.asc"
+            : "first_air_date.asc";
+        params["vote_count.gte"] = 200;
         break;
+      case TabCategory.POPULAR:
       case TabCategory.DISCOVER:
       default:
-        endpoint = `${MovieEndPoint.DISCOVER}/${type.value}`;
+        params["sort_by"] = "popularity.desc";
+        params["vote_count.gte"] = COMMON_NUMBERS.voteCount;
         break;
     }
 
     if (score) {
-      endpoint += `?vote_average.gte=${score.value}`;
+      params["vote_average.gte"] = score.value;
     }
 
     let pagesToUse = totalPages;
 
     // --- LOGIC FOR THE VERY FIRST FETCH ---
     if (pagesToUse === 0) {
-      const firstResponse = endpoint.includes(MovieEndPoint.DISCOVER)
-        ? ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
-            endpoint,
-            page: 1,
-            sort_by: "popularity.desc",
-            "vote_count.gte": COMMON_NUMBERS.voteCount,
-          })) as MovieResponse)
-        : ((yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
-            endpoint,
-            page: 1,
-          })) as MovieResponse);
+      const firstResponse = (yield callApiWithNetworkCheck(
+        getDiscoveredMoviesApi,
+        {
+          endpoint,
+          page: 1,
+          ...params,
+        }
+      )) as MovieResponse;
       pagesToUse = Math.min(
         firstResponse.total_pages || 0,
         COMMON_NUMBERS.maxBrowsingPages
@@ -113,32 +120,24 @@ function* getDiscoveredMoviesRequest(
     }
 
     let moviesResponse: MovieResponse = {};
+    let newPage: number = 0;
 
-    if (endpoint.includes(MovieEndPoint.DISCOVER)) {
+    if (activeTab === TabCategory.DISCOVER) {
       // --- LOGIC TO FIND A NEW, UNIQUE RANDOM PAGE ---
-      let randomPage;
       do {
-        randomPage = Math.floor(Math.random() * pagesToUse) + 1;
-      } while (fetchedPages.includes(randomPage)); // Keep picking until we find a page we haven't fetched
-
-      moviesResponse = (yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
-        endpoint,
-        page: randomPage,
-        sort_by: "popularity.desc",
-        "vote_count.gte": COMMON_NUMBERS.voteCount,
-      })) as MovieResponse;
-      yield put(setCurrentPage(randomPage));
-      // Add the new page to list of fetched pages
-      yield put(addFetchedPage(randomPage));
+        newPage = Math.floor(Math.random() * pagesToUse) + 1;
+      } while (fetchedPages.includes(newPage)); // Keep picking until we find a page we haven't fetched
     } else {
-      const newPage = currentPage + 1;
-      moviesResponse = (yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
-        endpoint,
-        page: newPage,
-      })) as MovieResponse;
-      yield put(setCurrentPage(newPage));
-      yield put(addFetchedPage(newPage));
+      newPage = currentPage + 1;
     }
+
+    moviesResponse = (yield callApiWithNetworkCheck(getDiscoveredMoviesApi, {
+      endpoint,
+      page: newPage,
+      ...params,
+    })) as MovieResponse;
+    yield put(setCurrentPage(newPage));
+    yield put(addFetchedPage(newPage));
 
     const movies: Movie[] = moviesResponse.results || [];
 

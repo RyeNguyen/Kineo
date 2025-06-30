@@ -34,7 +34,7 @@ export const COMMON_NUMBERS = {
   overviewCharacterLimit: 150,
   pollingTime: 500,
   seekingTime: 5,
-  voteCount: 200,
+  voteCount: 500,
   youtubeAspectRatio: 16 / 9,
 };
 
