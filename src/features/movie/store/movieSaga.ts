@@ -1,5 +1,7 @@
 import type {
+  Country,
   Movie,
+  MovieGenreResponse,
   MovieResponse,
   MovieVideoResponse,
 } from "./../models/movie.model";
@@ -14,15 +16,31 @@ import type { MovieState, MovieWithMetadata } from "./movieSlice";
 import {
   addFetchedPage,
   clearMovieState,
+  getCountries,
+  getCountriesFailure,
+  getCountriesSuccess,
   getDiscoveredMovies,
   getDiscoveredMoviesFailure,
   getDiscoveredMoviesSuccess,
+  getGenres,
+  getGenresFailure,
+  getGenresSuccess,
   refreshMovies,
   setCurrentPage,
   setTotalPages,
 } from "./movieSlice";
-import { getDiscoveredMoviesApi, getMovieTrailersApi } from "../services";
-import { MovieEndPoint, TabCategory, VideoType } from "@/shared/constant";
+import {
+  getCountriesApi,
+  getDiscoveredMoviesApi,
+  getGenresApi,
+  getMovieTrailersApi,
+} from "../services";
+import {
+  ADVANCED_FILTER,
+  MovieEndPoint,
+  TabCategory,
+  VideoType,
+} from "@/shared/constant";
 import { COMMON_NUMBERS } from "@/shared/constant";
 
 const getMovieState = (state: { movie: MovieState }) => state.movie;
@@ -66,38 +84,55 @@ function* getDiscoveredMoviesRequest(
       getMovieState
     )) as MovieState;
     const { currentPage, fetchedPages, totalPages } = pagination[activeTab];
-    const { score, type } = filter;
+    const { genres, score, type, voteCount } = filter;
 
     const endpoint = `${MovieEndPoint.DISCOVER}/${type.value}`;
     const params: Record<string, unknown> = {};
 
     switch (activeTab) {
       case TabCategory.TOP_RATED:
-        params["sort_by"] = "vote_average.desc";
-        params["vote_count.gte"] = COMMON_NUMBERS.voteCount;
+        params[ADVANCED_FILTER.criteria.sortBy] =
+          `${ADVANCED_FILTER.criteria.voteAverage}.${ADVANCED_FILTER.order.desc}`;
+        params[
+          `${ADVANCED_FILTER.criteria.voteCount}.${ADVANCED_FILTER.comparison.gte}`
+        ] = COMMON_NUMBERS.voteCount;
         break;
       case TabCategory.UPCOMING:
         params[
           type.value === VideoType.MOVIE
-            ? "primary_release_date.gte"
-            : "first_air_date.gte"
-        ] = "2025-03-30";
-        params["sort_by"] =
+            ? `${ADVANCED_FILTER.criteria.primaryReleaseDate}.${ADVANCED_FILTER.comparison.gte}`
+            : `${ADVANCED_FILTER.criteria.firstAirDate}.${ADVANCED_FILTER.comparison.gte}`
+        ] = new Date().toISOString().split("T")[0];
+        params[ADVANCED_FILTER.criteria.sortBy] =
           type.value === VideoType.MOVIE
-            ? "primary_release_date.asc"
-            : "first_air_date.asc";
-        params["vote_count.gte"] = 200;
+            ? `${ADVANCED_FILTER.criteria.primaryReleaseDate}.${ADVANCED_FILTER.order.asc},${ADVANCED_FILTER.criteria.popularity}.${ADVANCED_FILTER.order.desc}`
+            : `${ADVANCED_FILTER.criteria.firstAirDate}.${ADVANCED_FILTER.order.asc},${ADVANCED_FILTER.criteria.popularity}.${ADVANCED_FILTER.order.desc}`;
         break;
       case TabCategory.POPULAR:
       case TabCategory.DISCOVER:
       default:
-        params["sort_by"] = "popularity.desc";
-        params["vote_count.gte"] = COMMON_NUMBERS.voteCount;
+        params[ADVANCED_FILTER.criteria.sortBy] =
+          `${ADVANCED_FILTER.criteria.popularity}.${ADVANCED_FILTER.order.desc}`;
+        params[
+          `${ADVANCED_FILTER.criteria.voteCount}.${ADVANCED_FILTER.comparison.gte}`
+        ] = COMMON_NUMBERS.voteCount;
         break;
     }
 
     if (score) {
-      params["vote_average.gte"] = score.value;
+      params[
+        `${ADVANCED_FILTER.criteria.voteAverage}.${ADVANCED_FILTER.comparison.gte}`
+      ] = score.value;
+    }
+
+    if (voteCount) {
+      params[
+        `${ADVANCED_FILTER.criteria.voteCount}.${ADVANCED_FILTER.comparison.gte}`
+      ] = voteCount.value;
+    }
+
+    if (genres.length > 0) {
+      // TODO: Add genres filtering here
     }
 
     let pagesToUse = totalPages;
@@ -171,7 +206,41 @@ function* refreshFeedRequest(): Generator<unknown, void, unknown> {
   }
 }
 
+function* getCountriesRequest(): Generator<unknown, void, unknown> {
+  try {
+    const response: Country[] = (yield callApiWithNetworkCheck(
+      getCountriesApi
+    )) as Country[];
+
+    yield put(getCountriesSuccess(response));
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : t("common:error.unknown_error");
+    yield put(getCountriesFailure(errorMessage)); // Dispatch failure action
+  }
+}
+
+function* getGenresRequest(): Generator<unknown, void, unknown> {
+  try {
+    const { filter } = (yield select(getMovieState)) as MovieState;
+    const { type } = filter;
+
+    const response: MovieGenreResponse = (yield callApiWithNetworkCheck(
+      getGenresApi,
+      type.value
+    )) as MovieGenreResponse;
+
+    yield put(getGenresSuccess(response.genres || []));
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : t("common:error.unknown_error");
+    yield put(getGenresFailure(errorMessage)); // Dispatch failure action
+  }
+}
+
 export function* movieSaga() {
   yield takeLatest(getDiscoveredMovies.type, getDiscoveredMoviesRequest);
   yield takeLatest(refreshMovies.type, refreshFeedRequest);
+  yield takeLatest(getCountries.type, getCountriesRequest);
+  yield takeLatest(getGenres.type, getGenresRequest);
 }

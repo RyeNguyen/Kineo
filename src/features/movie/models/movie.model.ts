@@ -1,6 +1,21 @@
 import { z } from "zod";
 
-export const movieSchema = z.object({
+export const CountrySchema = z.object({
+  english_name: z.string().optional(),
+  iso_3166_1: z.string().optional(),
+  native_name: z.string().optional(),
+});
+
+export const MovieGenreSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().optional(),
+});
+
+export const MovieGenreResponseSchema = z.object({
+  genres: z.array(MovieGenreSchema).optional(),
+});
+
+export const MovieSchema = z.object({
   adult: z.boolean(),
   backdrop_path: z.string().optional(),
   first_air_date: z.string().optional(),
@@ -40,15 +55,18 @@ export const MovieVideoResponseSchema = z.object({
   results: z.array(MovieVideoSchema).optional(),
 });
 
-export const movieResponseSchema = z.object({
+export const MovieResponseSchema = z.object({
   page: z.number().optional(),
-  results: z.array(movieSchema).optional(),
+  results: z.array(MovieSchema).optional(),
   total_pages: z.number().optional(),
   total_results: z.number().optional(),
 });
 
 // TypeScript type based on the schema
-export type Movie = z.infer<typeof movieSchema>;
-export type MovieResponse = z.infer<typeof movieResponseSchema>;
+export type Movie = z.infer<typeof MovieSchema>;
+export type MovieResponse = z.infer<typeof MovieResponseSchema>;
 export type MovieVideo = z.infer<typeof MovieVideoSchema>;
+export type MovieGenreResponse = z.infer<typeof MovieGenreResponseSchema>;
+export type MovieGenre = z.infer<typeof MovieGenreSchema>;
 export type MovieVideoResponse = z.infer<typeof MovieVideoResponseSchema>;
+export type Country = z.infer<typeof CountrySchema>;

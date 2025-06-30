@@ -38,6 +38,21 @@ export const COMMON_NUMBERS = {
   youtubeAspectRatio: 16 / 9,
 };
 
-export const VOTE_COUNT = {
-  medium: 200,
+export const ADVANCED_FILTER = {
+  comparison: {
+    gte: "gte",
+    lte: "lte",
+  },
+  criteria: {
+    firstAirDate: "first_air_date",
+    popularity: "popularity",
+    primaryReleaseDate: "primary_release_date",
+    sortBy: "sort_by",
+    voteAverage: "vote_average",
+    voteCount: "vote_count",
+  },
+  order: {
+    asc: "asc",
+    desc: "desc",
+  },
 };

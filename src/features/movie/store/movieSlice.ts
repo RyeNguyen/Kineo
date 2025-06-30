@@ -2,8 +2,9 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
 import { StateStatus, TabCategory, VideoType } from "@/config";
-import type { Movie } from "../models/movie.model";
+import type { Country, Movie, MovieGenre } from "../models/movie.model";
 import { t } from "i18next";
+import type { defaultStoreData } from "@/shared";
 
 export interface MovieWithMetadata extends Movie {
   trailerKey?: string;
@@ -21,12 +22,23 @@ export interface MovieScore {
   value: number;
 }
 
+export interface MovieVoteCount {
+  id: number;
+  name: string;
+  value: number;
+}
+
 export interface MovieState {
   activeTab: TabCategory;
+  countries: defaultStoreData<Country[]>;
   filter: {
+    // countries?: Country[];
+    genres: string[];
     score?: MovieScore;
     type: MovieType;
+    voteCount?: MovieVoteCount;
   };
+  genres: defaultStoreData<MovieGenre[]>;
   pagination: {
     [key in TabCategory]: {
       currentPage: number;
@@ -56,12 +68,23 @@ const setupInitialPagination = (): MovieState["pagination"] => {
 
 const initialState: MovieState = {
   activeTab: TabCategory.DISCOVER,
+  countries: {
+    data: [],
+    error: "",
+    status: StateStatus.INIT,
+  },
   filter: {
+    genres: [],
     type: {
       id: 1,
       name: t("filter:movies"),
       value: VideoType.MOVIE,
     },
+  },
+  genres: {
+    data: [],
+    error: "",
+    status: StateStatus.INIT,
   },
   pagination: setupInitialPagination(),
 };
@@ -92,6 +115,25 @@ const movieSlice = createSlice({
         totalPages: 0,
       });
     },
+    getCountries: (state) => {
+      Object.assign(state.countries, {
+        error: "",
+        status: StateStatus.LOADING,
+      });
+    },
+    getCountriesFailure: (state, action: PayloadAction<string>) => {
+      Object.assign(state.countries, {
+        error: action.payload,
+        status: StateStatus.ERROR,
+      });
+    },
+    getCountriesSuccess: (state, action: PayloadAction<Country[]>) => {
+      Object.assign(state.countries, {
+        data: action.payload,
+        error: "",
+        status: StateStatus.SUCCESS,
+      });
+    },
     getDiscoveredMovies: (state) => {
       Object.assign(state.pagination[state.activeTab], {
         error: "",
@@ -115,6 +157,25 @@ const movieSlice = createSlice({
         status: StateStatus.SUCCESS,
       });
     },
+    getGenres: (state) => {
+      Object.assign(state.genres, {
+        error: "",
+        status: StateStatus.LOADING,
+      });
+    },
+    getGenresFailure: (state, action: PayloadAction<string>) => {
+      Object.assign(state.genres, {
+        error: action.payload,
+        status: StateStatus.ERROR,
+      });
+    },
+    getGenresSuccess: (state, action: PayloadAction<MovieGenre[]>) => {
+      Object.assign(state.genres, {
+        data: action.payload,
+        error: "",
+        status: StateStatus.SUCCESS,
+      });
+    },
     refreshMovies: (state) => {},
     setActiveTab: (state, action: PayloadAction<TabCategory>) => {
       state.activeTab = action.payload;
@@ -127,22 +188,53 @@ const movieSlice = createSlice({
     },
     updateMovieFilters: (
       state,
-      action: PayloadAction<Record<string, MovieScore | MovieType>>
+      action: PayloadAction<
+        Record<string, MovieGenre | MovieScore | MovieType | MovieVoteCount>
+      >
     ) => {
       Object.keys(action.payload).forEach((key: string) => {
         const filterKey = key as keyof typeof state.filter;
+        const newFilter = action.payload[filterKey];
 
-        if (key !== "type") {
-          if (
-            state.filter[filterKey] &&
-            state.filter[filterKey]?.value === action.payload[filterKey].value
-          ) {
-            delete state.filter[filterKey];
-          } else {
-            Object.assign(state.filter, action.payload);
+        switch (filterKey) {
+          case "genres": {
+            let criteria = state.filter[filterKey];
+
+            if (
+              criteria.some((el: string) => el === newFilter.id?.toString())
+            ) {
+              criteria = criteria.filter(
+                (el: string) => el !== newFilter.id?.toString()
+              );
+            } else {
+              criteria.push(newFilter.id?.toString() as string);
+            }
+            Object.assign(state.filter, { genres: criteria });
+            break;
           }
-        } else {
-          Object.assign(state.filter, action.payload);
+          case "score":
+          case "voteCount": {
+            const criteria = state.filter[filterKey];
+
+            if (
+              criteria &&
+              "value" in newFilter &&
+              typeof criteria !== "string" &&
+              criteria.value === newFilter.value
+            ) {
+              delete state.filter[filterKey];
+            } else {
+              Object.assign(state.filter, action.payload);
+            }
+            break;
+          }
+          case "type":
+          default: {
+            {
+              Object.assign(state.filter, action.payload);
+              break;
+            }
+          }
         }
       });
     },
@@ -154,9 +246,15 @@ export const {
   clearAllMovieState,
   clearFilters,
   clearMovieState,
+  getCountries,
+  getCountriesFailure,
+  getCountriesSuccess,
   getDiscoveredMovies,
   getDiscoveredMoviesFailure,
   getDiscoveredMoviesSuccess,
+  getGenres,
+  getGenresFailure,
+  getGenresSuccess,
   refreshMovies,
   setActiveTab,
   setCurrentPage,

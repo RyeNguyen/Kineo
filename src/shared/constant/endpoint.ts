@@ -12,8 +12,14 @@ export const AuthEndPoint = {
 
 export const MovieEndPoint = {
   DISCOVER: `/discover`,
+  GENRE: `/genre/{movieType}/list`,
   ON_THE_AIR: `/on_the_air`,
   POPULAR: `/popular`,
   TOP_RATED: `/top_rated`,
   UPCOMING: `/upcoming`,
+};
+
+export const ConfigurationEndpoint = {
+  COUNTRIES: `/configuration/countries`,
+  LANGUAGES: `/configuration/languages`,
 };
