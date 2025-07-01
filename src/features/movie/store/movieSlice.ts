@@ -32,7 +32,7 @@ export interface MovieState {
   activeTab: TabCategory;
   countries: defaultStoreData<Country[]>;
   filter: {
-    // countries?: Country[];
+    country?: string;
     genres: string[];
     score?: MovieScore;
     type: MovieType;
@@ -192,7 +192,7 @@ const movieSlice = createSlice({
       action: PayloadAction<
         Record<
           string,
-          MovieGenre | MovieScore | MovieType | MovieVoteCount | number
+          MovieGenre | MovieScore | MovieType | MovieVoteCount | number | string
         >
       >
     ) => {

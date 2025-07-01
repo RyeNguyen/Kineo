@@ -5,5 +5,6 @@ export const enum Paths {
   Login = "login",
   Main = "main",
   Register = "register",
+  SelectCountry = "selectCountry",
   Startup = "startup",
 }

@@ -2,7 +2,7 @@ import type { LayoutChangeEvent } from "react-native";
 import { Pressable, RefreshControl, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
-import type { Paths } from "@/navigation/paths";
+import { Paths } from "@/navigation/paths";
 import useTheme from "@/shared/hook/useTheme";
 import {
   FeedTabs,
@@ -19,6 +19,7 @@ import type {
 import {
   clearAllMovieState,
   clearFilters,
+  getCountries,
   getDiscoveredMovies,
   getGenres,
   refreshMovies,
@@ -34,23 +35,34 @@ import FilterSheetContent from "../components/FilterSheetContent";
 import { t } from "i18next";
 import type { BottomSheetDefaultFooterProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetFooter/types";
 import { BottomSheetFooter } from "@gorhom/bottom-sheet";
+import { useFocusEffect } from "@react-navigation/native";
 
 function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   const { backgrounds, colors, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
-  const { activeTab, genres, pagination } = useSelector(
+  const { activeTab, countries, genres, pagination } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
-  console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
+  // console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
   const { movies, status } = pagination[activeTab];
 
   const [visibleItemIndex, setVisibleItemIndex] = useState<number>(0);
   const [layoutHeight, setLayoutHeight] = useState<number>(0);
+  const [shouldReopenFilter, setShouldReopenFilter] = useState<boolean>(false);
 
   const filterSheetRef = useRef<BaseBottomSheetRef>(null);
 
   const isRefreshing = status === StateStatus.LOADING && movies.length > 0;
+
+  useFocusEffect(
+    useCallback(() => {
+      if (shouldReopenFilter) {
+        filterSheetRef.current?.onExpand();
+        setShouldReopenFilter(false);
+      }
+    }, [shouldReopenFilter])
+  );
 
   useEffect(() => {
     if (movies.length === 0) {
@@ -96,8 +108,12 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     if (!genres.data.length) {
       dispatch(getGenres());
     }
+
+    if (!countries.data.length) {
+      dispatch(getCountries());
+    }
     filterSheetRef.current?.onExpand();
-  }, [dispatch, genres.data.length]);
+  }, [countries.data.length, dispatch, genres.data.length]);
 
   const handleCloseFilters = useCallback(() => {
     filterSheetRef.current?.close();
@@ -115,6 +131,12 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     dispatch(getDiscoveredMovies());
     filterSheetRef.current?.close();
   }, [dispatch]);
+
+  const handleNavigateToCountryPicker = useCallback(() => {
+    setShouldReopenFilter(true);
+    filterSheetRef.current?.close();
+    navigation.navigate(Paths.SelectCountry);
+  }, [navigation]);
 
   const renderBottomSheetFooter = useCallback(
     (props: BottomSheetDefaultFooterProps & React.JSX.IntrinsicAttributes) => {
@@ -256,7 +278,10 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
         style={[backgrounds.gray800]}
       >
         {/* The content of the sheet will be a new component */}
-        <FilterSheetContent onClose={handleCloseFilters} />
+        <FilterSheetContent
+          onClose={handleCloseFilters}
+          onNavigateToCountryPicker={handleNavigateToCountryPicker}
+        />
       </BaseBottomSheet>
     </SafeScreen>
   );

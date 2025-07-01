@@ -1,10 +1,8 @@
-// src/screens/FeedScreen/FilterSheetContent.tsx
-
 import { Button } from "@/shared/components/atoms";
 import { useTheme } from "@/shared/hook";
 import { t } from "i18next";
 import React, { useEffect } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { FlatList, ScrollView, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import type {
   MovieScore,
@@ -14,7 +12,8 @@ import type {
 } from "../store/movieSlice";
 import { getGenres, updateMovieFilters } from "../store/movieSlice";
 import { VideoType } from "@/config";
-import type { MovieGenre } from "../models/movie.model";
+import type { Country, MovieGenre } from "../models/movie.model";
+import { COMMON_NUMBERS } from "@/shared/constant";
 
 const MOVIE_TYPES: MovieType[] = [
   {
@@ -72,22 +71,33 @@ const MOVIE_VOTE_COUNTS: MovieVoteCount[] = [
 
 const currentYear = new Date().getFullYear();
 const YEARS = Array.from(
-  { length: currentYear - 1999 },
+  { length: currentYear - COMMON_NUMBERS.startFromYear },
   (_, i) => currentYear - i
 );
 
 interface FilterSheetContentProps {
   onClose: () => void;
+  onNavigateToCountryPicker?: () => void;
 }
 
-const FilterSheetContent = ({ onClose }: FilterSheetContentProps) => {
+const FilterSheetContent = ({
+  onClose,
+  onNavigateToCountryPicker = undefined,
+}: FilterSheetContentProps) => {
   const { backgrounds, borders, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
   const { countries, filter, genres } = useSelector(
     (state: { movie: MovieState }) => state.movie
   );
-  const { genres: filterGenres, score, type, voteCount, year } = filter;
+  const {
+    country,
+    genres: filterGenres,
+    score,
+    type,
+    voteCount,
+    year,
+  } = filter;
 
   useEffect(() => {
     dispatch(getGenres());
@@ -256,6 +266,68 @@ const FilterSheetContent = ({ onClose }: FilterSheetContentProps) => {
         </ScrollView>
       </View>
 
+      {/* Primary country */}
+      <View style={gutters.gap_SMALL}>
+        <Text
+          style={[
+            fonts.size_SM_BeVietnamProSemiBold,
+            fonts.white,
+            layout.lineHeightMD,
+          ]}
+        >
+          {t("filter:primary_country")}
+        </Text>
+
+        <FlatList
+          data={[]}
+          horizontal
+          ListFooterComponent={
+            <Button
+              buttonStyle={[
+                borders.gray100,
+                borders.w_1,
+                backgrounds.transparent,
+              ]}
+              buttonTextStyle={[
+                fonts.gray100,
+                fonts.size_SM_BeVietnamProRegular,
+              ]}
+              onPress={onNavigateToCountryPicker}
+              title={t("filter:more")}
+            />
+          }
+          renderItem={({ index, item }: { index: number; item: Country }) => {
+            const isSelected = item.iso_3166_1 === country;
+
+            return (
+              <View key={item.iso_3166_1 || index}>
+                <Button
+                  buttonStyle={[
+                    isSelected ? borders.primary400 : borders.gray100,
+                    borders.w_1,
+                    backgrounds.transparent,
+                  ]}
+                  buttonTextStyle={[
+                    isSelected ? fonts.primary400 : fonts.gray100,
+                    fonts.size_SM_BeVietnamProRegular,
+                  ]}
+                  onPress={() =>
+                    dispatch(
+                      updateMovieFilters({
+                        country: item.iso_3166_1 || "",
+                      })
+                    )
+                  }
+                  title={item.english_name}
+                />
+              </View>
+            );
+          }}
+          showsHorizontalScrollIndicator={false}
+          style={[layout.row, gutters.gap_SMALL]}
+        />
+      </View>
+
       {/* Genres */}
       <View style={gutters.gap_SMALL}>
         <Text
@@ -296,25 +368,6 @@ const FilterSheetContent = ({ onClose }: FilterSheetContentProps) => {
           })}
         </View>
       </View>
-
-      {/* <View style={gutters.gap_SMALL}>
-        <Text
-          style={[
-            fonts.size_SM_BeVietnamProSemiBold,
-            fonts.white,
-            layout.lineHeightMD,
-          ]}
-        >
-          Genres
-        </Text>
-
-        <View style={[layout.row, layout.wrap, gutters.gap_SMALL]}>
-          {GENRES.map((genre) => {
-            const isSelected = selectedGenres.includes(genre.id);
-            return <Button title={genre.name} />;
-          })}
-        </View>
-      </View> */}
     </View>
   );
 };

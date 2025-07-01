@@ -8,6 +8,7 @@ export type RootStackParamList = {
   [Paths.Login]: undefined;
   [Paths.Main]: undefined;
   [Paths.Register]: undefined;
+  [Paths.SelectCountry]: undefined;
   [Paths.Startup]: undefined;
 };
 
