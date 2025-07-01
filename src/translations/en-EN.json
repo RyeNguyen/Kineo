@@ -24,6 +24,10 @@
       "common_error": "Oops! Something went wrong.",
       "no_internet": "No internet connection!",
       "unknown_error": "An unknown error occurred!"
+    },
+    "phase": {
+      "cancel": "Cancel",
+      "confirm": "Confirm"
     }
   },
   "auth": {
@@ -81,5 +85,8 @@
     "genres": "Genres",
     "years": "Years",
     "more": "More..."
+  },
+  "search": {
+    "search_country": "Search country..."
   }
 }

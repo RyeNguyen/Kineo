@@ -11,7 +11,7 @@ const colorsLight = {
   gray100: "#B2B2B2",
   gray200: "#A1A1A1",
   gray400: "#535353",
-  gray50: "#EFEFEF",
+  gray500Opaque60: "rgba(82, 77, 77, 0.6)",
   gray800: "#1D1D1D",
   purple100: "#E1E1EF",
   purple50: "#1B1A23",
@@ -27,7 +27,7 @@ const colorsLight = {
   primary600: "#5C665A",
 
   // Background
-  background50: "#E8E8E8",
+  background100: "RGBA()",
 } as const;
 
 const colorsDark = {
@@ -35,7 +35,7 @@ const colorsDark = {
   gray100: "#B2B2B2",
   gray200: "#BABABA",
   gray400: "#535353",
-  gray50: "#EFEFEF",
+  gray500Opaque60: "rgba(82, 77, 77, 0.6)",
   gray800: "#1D1D1D",
   purple100: "#252732",
   purple50: "#1B1A23",
@@ -121,8 +121,8 @@ export const config = {
   gutters: sizes,
   navigationColors: {
     ...DefaultTheme.colors,
-    background: colorsLight.gray50,
-    card: colorsLight.gray50,
+    background: colorsLight.gray500Opaque60,
+    card: colorsLight.gray500Opaque60,
   },
   variants: {
     dark: {

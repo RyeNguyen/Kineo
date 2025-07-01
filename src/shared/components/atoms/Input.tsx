@@ -36,26 +36,27 @@ const Input = ({
           layout.fullWidth,
           layout.row,
           layout.itemsCenter,
-          backgrounds.white,
+          backgrounds.gray500Opaque60,
           gutters.paddingHorizontal_MEDIUM,
-          gutters.gap_MEDIUM,
+          gutters.gap_XSMALL,
           borders.rounded_16,
           borders.w_2,
           !!errorMsg
             ? borders.red500
             : isFocused
-              ? borders.primary500
+              ? borders.primary400
               : borders.transparent,
           components.defaultInput,
         ]}
       >
+        <IconByVariant path={ICONS.iconSearch} />
         <TextInput
           onBlur={() => setIsFocused(false)}
           onFocus={() => setIsFocused(true)}
-          placeholderTextColor={colors.primary600}
+          placeholderTextColor={colors.gray100}
           secureTextEntry={isSecured && !isPasswordShown}
           style={[
-            fonts.primary500,
+            fonts.white,
             fonts.size_SM_BeVietnamProRegular,
             layout.flex_1,
           ]}

@@ -101,10 +101,10 @@ const movieSlice = createSlice({
       }
     },
     clearAllMovieState: (state) => {
-      Object.assign(state.pagination, initialState.pagination);
+      state.pagination = initialState.pagination;
     },
     clearFilters: (state) => {
-      Object.assign(state.filter, initialState.filter);
+      state.filter = initialState.filter;
     },
     clearMovieState: (state) => {
       Object.assign(state.pagination[state.activeTab], {
@@ -187,61 +187,62 @@ const movieSlice = createSlice({
     setTotalPages: (state, action: PayloadAction<number>) => {
       state.pagination[state.activeTab].totalPages = action.payload;
     },
-    updateMovieFilters: (
-      state,
-      action: PayloadAction<
-        Record<
-          string,
-          MovieGenre | MovieScore | MovieType | MovieVoteCount | number | string
-        >
-      >
-    ) => {
-      Object.keys(action.payload).forEach((key: string) => {
-        const filterKey = key as keyof typeof state.filter;
-        const newFilter = action.payload[filterKey];
+    updateCountryFilter: (state, action: PayloadAction<string>) => {
+      const criteria = state.filter.country;
+      const newCountry = action.payload;
 
-        switch (filterKey) {
-          case "genres": {
-            let criteria = state.filter[filterKey];
+      if (criteria && criteria === newCountry) {
+        delete state.filter.country;
+      } else {
+        state.filter.country = action.payload;
+      }
+    },
+    updateGenresFilter: (state, action: PayloadAction<MovieGenre>) => {
+      let criteria = state.filter.genres;
+      const newGenre = action.payload;
 
-            if (
-              criteria.some((el: string) => el === newFilter.id?.toString())
-            ) {
-              criteria = criteria.filter(
-                (el: string) => el !== newFilter.id?.toString()
-              );
-            } else {
-              criteria.push(newFilter.id?.toString() as string);
-            }
-            Object.assign(state.filter, { genres: criteria });
-            break;
-          }
-          case "score":
-          case "voteCount": {
-            const criteria = state.filter[filterKey];
+      if (criteria.some((el: string) => el === newGenre.id?.toString())) {
+        criteria = criteria.filter(
+          (el: string) => el !== newGenre.id?.toString()
+        );
+      } else {
+        criteria.push(newGenre.id?.toString() as string);
+      }
 
-            if (
-              criteria &&
-              "value" in newFilter &&
-              typeof criteria !== "string" &&
-              criteria.value === newFilter.value
-            ) {
-              delete state.filter[filterKey];
-            } else {
-              Object.assign(state.filter, action.payload);
-            }
-            break;
-          }
-          case "year":
-          case "type":
-          default: {
-            {
-              Object.assign(state.filter, action.payload);
-              break;
-            }
-          }
-        }
-      });
+      Object.assign(state.filter, { genres: criteria });
+    },
+    updateScoreFilter: (state, action: PayloadAction<MovieScore>) => {
+      const criteria = state.filter.score;
+      const newScore = action.payload;
+
+      if (criteria && criteria.value === newScore.value) {
+        delete state.filter.score;
+      } else {
+        state.filter.score = action.payload;
+      }
+    },
+    updateTypeFilter: (state, action: PayloadAction<MovieType>) => {
+      state.filter.type = action.payload;
+    },
+    updateVoteCountFilter: (state, action: PayloadAction<MovieVoteCount>) => {
+      const criteria = state.filter.voteCount;
+      const newVoteCount = action.payload;
+
+      if (criteria && criteria.value === newVoteCount.value) {
+        delete state.filter.voteCount;
+      } else {
+        state.filter.voteCount = action.payload;
+      }
+    },
+    updateYearFilter: (state, action: PayloadAction<number>) => {
+      const criteria = state.filter.year;
+      const newYear = action.payload;
+
+      if (criteria && criteria === newYear) {
+        delete state.filter.year;
+      } else {
+        state.filter.year = action.payload;
+      }
     },
   },
 });
@@ -264,6 +265,11 @@ export const {
   setActiveTab,
   setCurrentPage,
   setTotalPages,
-  updateMovieFilters,
+  updateCountryFilter,
+  updateGenresFilter,
+  updateScoreFilter,
+  updateTypeFilter,
+  updateVoteCountFilter,
+  updateYearFilter,
 } = movieSlice.actions;
 export default movieSlice.reducer;

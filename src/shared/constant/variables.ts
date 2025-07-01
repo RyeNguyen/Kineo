@@ -9,11 +9,14 @@ export const DEVICE_SIZE = {
 
 export const ICONS = {
   iconBack: "iconBack",
+  iconBackward: "iconBackward",
   iconEye: "iconEye",
   iconEyeHidden: "iconEyeHidden",
   iconFilter: "iconFilter",
+  iconForward: "iconForward",
   iconMovie: "iconMovie",
   iconNextWhite: "iconNextWhite",
+  iconPause: "iconPause",
   iconPlay: "iconPlay",
   iconProfile: "iconProfile",
   iconSearch: "iconSearch",
@@ -39,6 +42,18 @@ export const COMMON_NUMBERS = {
   youtubeAspectRatio: 16 / 9,
 };
 
+export const COMMON_COUNTRIES = [
+  "Canada",
+  "France",
+  "Germany",
+  "Italy",
+  "India",
+  "Japan",
+  "Spain",
+  "United States",
+  "United Kingdom",
+];
+
 export const ADVANCED_FILTER = {
   comparison: {
     gte: "gte",
@@ -54,6 +69,7 @@ export const ADVANCED_FILTER = {
     voteAverage: "vote_average",
     voteCount: "vote_count",
     withGenres: "with_genres",
+    withOriginCountry: "with_origin_country",
   },
   order: {
     asc: "asc",

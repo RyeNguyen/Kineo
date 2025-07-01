@@ -84,7 +84,7 @@ function* getDiscoveredMoviesRequest(
       getMovieState
     )) as MovieState;
     const { currentPage, fetchedPages, totalPages } = pagination[activeTab];
-    const { genres, score, type, voteCount, year } = filter;
+    const { country, genres, score, type, voteCount, year } = filter;
 
     const endpoint = `${MovieEndPoint.DISCOVER}/${type.value}`;
     const params: Record<string, unknown> = {};
@@ -148,6 +148,10 @@ function* getDiscoveredMoviesRequest(
           ? `${ADVANCED_FILTER.criteria.primaryReleaseYear}`
           : `${ADVANCED_FILTER.criteria.firstAirDateYear}`
       ] = year;
+    }
+
+    if (country) {
+      params[`${ADVANCED_FILTER.criteria.withOriginCountry}`] = country;
     }
 
     let pagesToUse = totalPages;

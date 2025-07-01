@@ -79,6 +79,7 @@ const Button = ({
         {icon && <IconByVariant path={icon} style={[components.elementMd]} />}
         {title && (
           <Text
+            numberOfLines={1}
             style={[
               isSecondary ? fonts.primary400 : fonts.gray400,
               isSecondary

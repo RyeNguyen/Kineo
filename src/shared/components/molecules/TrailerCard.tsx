@@ -61,7 +61,9 @@ const TrailerCard = ({
   const [duration, setDuration] = useState<number>(0);
   const [progress, setProgress] = useState<number>(0);
   const [isSeeking, setIsSeeking] = useState<boolean>(false);
+  const [areControlsVisible, setAreControlsVisible] = useState<boolean>(true);
 
+  const hideControlsTimeout = useRef<NodeJS.Timeout | null>(null);
   const playerRef = useRef<typeof YoutubeIframe>(null);
 
   useEffect(() => {
@@ -94,6 +96,38 @@ const TrailerCard = ({
       }
     };
   }, [isPlaying, isSeeking]);
+
+  const showControls = useCallback(() => {
+    // If a timer is already running to hide the controls, clear it.
+    if (hideControlsTimeout.current) {
+      clearTimeout(hideControlsTimeout.current);
+    }
+    // Make the controls visible
+    setAreControlsVisible(true);
+
+    // Set a new timer to hide the controls after 3 seconds
+    hideControlsTimeout.current = setTimeout(() => {
+      // We only hide the controls if the video is currently playing
+      if (isPlaying) {
+        setAreControlsVisible(false);
+      }
+    }, 3000); // 3 seconds
+  }, [isPlaying]);
+
+  useEffect(() => {
+    // If the video becomes paused, or if the controls are already visible,
+    // ensure the fade-out timer is running.
+    if (!isPlaying || areControlsVisible) {
+      showControls();
+    }
+
+    // Cleanup the timer when the component unmounts
+    return () => {
+      if (hideControlsTimeout.current) {
+        clearTimeout(hideControlsTimeout.current);
+      }
+    };
+  }, [isPlaying, showControls, areControlsVisible]);
 
   const movieTitle = useMemo(() => {
     return `${movie.title || movie.name} (${getYear(movie.release_date || movie.first_air_date || Date.now().toString())})`;
@@ -137,6 +171,11 @@ const TrailerCard = ({
   const togglePlaying = useCallback(() => {
     setIsPlaying((prev) => !prev);
   }, []);
+
+  const handleSingleTap = useCallback(() => {
+    showControls();
+    setIsPlaying((prev) => !prev);
+  }, [showControls]);
 
   const seekBackward = useCallback(() => {
     const newTime = Math.max(0, progress - COMMON_NUMBERS.seekingTime); // Prevents going below 0

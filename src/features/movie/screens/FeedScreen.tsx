@@ -45,7 +45,7 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
     (state: { movie: MovieState }) => state.movie
   );
   // console.log("🚀 ~ FeedScreen ~ pagination:", pagination);
-  const { movies, status } = pagination[activeTab];
+  const { fetchedPages, movies, status, totalPages } = pagination[activeTab];
 
   const [visibleItemIndex, setVisibleItemIndex] = useState<number>(0);
   const [layoutHeight, setLayoutHeight] = useState<number>(0);
@@ -95,7 +95,7 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
 
   const handleLoadMore = () => {
     // Prevent multiple requests while one is already pending
-    if (status !== StateStatus.LOADING) {
+    if (status !== StateStatus.LOADING && fetchedPages.length < totalPages) {
       dispatch(getDiscoveredMovies());
     }
   };
@@ -206,15 +206,17 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
           (item.id || index).toString()
         }
         ListFooterComponent={
-          <View
-            style={[
-              layout.itemsCenter,
-              layout.justifyCenter,
-              { height: layoutHeight },
-            ]}
-          >
-            <Loader size={64} />
-          </View>
+          movies.length === 0 ? (
+            <View
+              style={[
+                layout.itemsCenter,
+                layout.justifyCenter,
+                { height: layoutHeight },
+              ]}
+            >
+              <Loader size={64} />
+            </View>
+          ) : null
         }
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.8}
@@ -279,7 +281,6 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
       >
         {/* The content of the sheet will be a new component */}
         <FilterSheetContent
-          onClose={handleCloseFilters}
           onNavigateToCountryPicker={handleNavigateToCountryPicker}
         />
       </BaseBottomSheet>

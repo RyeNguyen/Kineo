@@ -1,7 +1,7 @@
 import { Button } from "@/shared/components/atoms";
 import { useTheme } from "@/shared/hook";
 import { t } from "i18next";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FlatList, ScrollView, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import type {
@@ -10,10 +10,18 @@ import type {
   MovieType,
   MovieVoteCount,
 } from "../store/movieSlice";
-import { getGenres, updateMovieFilters } from "../store/movieSlice";
+import {
+  getGenres,
+  updateCountryFilter,
+  updateGenresFilter,
+  updateScoreFilter,
+  updateTypeFilter,
+  updateVoteCountFilter,
+  updateYearFilter,
+} from "../store/movieSlice";
 import { VideoType } from "@/config";
 import type { Country, MovieGenre } from "../models/movie.model";
-import { COMMON_NUMBERS } from "@/shared/constant";
+import { COMMON_COUNTRIES, COMMON_NUMBERS } from "@/shared/constant";
 
 const MOVIE_TYPES: MovieType[] = [
   {
@@ -76,12 +84,10 @@ const YEARS = Array.from(
 );
 
 interface FilterSheetContentProps {
-  onClose: () => void;
   onNavigateToCountryPicker?: () => void;
 }
 
 const FilterSheetContent = ({
-  onClose,
   onNavigateToCountryPicker = undefined,
 }: FilterSheetContentProps) => {
   const { backgrounds, borders, fonts, gutters, layout } = useTheme();
@@ -99,9 +105,36 @@ const FilterSheetContent = ({
     year,
   } = filter;
 
+  const [countriesOnUI, setCountriesOnUI] = useState<Country[]>([]);
+
   useEffect(() => {
     dispatch(getGenres());
   }, [dispatch, type.id]);
+
+  useEffect(() => {
+    setCountriesOnUI(
+      countries.data.filter((el: Country) =>
+        COMMON_COUNTRIES.includes(el.english_name as string)
+      )
+    );
+  }, [countries.data, countries.data.length]);
+
+  useEffect(() => {
+    const addNewContryOnUI = () => {
+      const newCountry = countries.data.find(
+        (el: Country) => el.iso_3166_1 === country
+      );
+
+      if (
+        newCountry &&
+        !countriesOnUI.some((el: Country) => el.iso_3166_1 === country)
+      ) {
+        setCountriesOnUI([newCountry, ...countriesOnUI]);
+      }
+    };
+
+    addNewContryOnUI();
+  }, [countries.data, countriesOnUI, country]);
 
   return (
     <View style={[layout.flex_1, gutters.gap_MEDIUM]}>
@@ -133,9 +166,7 @@ const FilterSheetContent = ({
                     isSelected ? fonts.primary400 : fonts.gray100,
                     fonts.size_SM_BeVietnamProRegular,
                   ]}
-                  onPress={() =>
-                    dispatch(updateMovieFilters({ type: movType }))
-                  }
+                  onPress={() => dispatch(updateTypeFilter(movType))}
                   title={movType.name}
                 />
               </View>
@@ -172,9 +203,7 @@ const FilterSheetContent = ({
                     isSelected ? fonts.primary400 : fonts.gray100,
                     fonts.size_SM_BeVietnamProRegular,
                   ]}
-                  onPress={() =>
-                    dispatch(updateMovieFilters({ score: movScore }))
-                  }
+                  onPress={() => dispatch(updateScoreFilter(movScore))}
                   title={movScore.name}
                 />
               </View>
@@ -214,7 +243,7 @@ const FilterSheetContent = ({
                       fonts.size_SM_BeVietnamProRegular,
                     ]}
                     onPress={() =>
-                      dispatch(updateMovieFilters({ voteCount: movVoteCount }))
+                      dispatch(updateVoteCountFilter(movVoteCount))
                     }
                     title={movVoteCount.name}
                   />
@@ -254,9 +283,7 @@ const FilterSheetContent = ({
                       isSelected ? fonts.primary400 : fonts.gray100,
                       fonts.size_SM_BeVietnamProRegular,
                     ]}
-                    onPress={() =>
-                      dispatch(updateMovieFilters({ year: movYear }))
-                    }
+                    onPress={() => dispatch(updateYearFilter(movYear))}
                     title={movYear.toString()}
                   />
                 </View>
@@ -279,7 +306,7 @@ const FilterSheetContent = ({
         </Text>
 
         <FlatList
-          data={[]}
+          data={countriesOnUI}
           horizontal
           ListFooterComponent={
             <Button
@@ -300,7 +327,10 @@ const FilterSheetContent = ({
             const isSelected = item.iso_3166_1 === country;
 
             return (
-              <View key={item.iso_3166_1 || index}>
+              <View
+                key={item.iso_3166_1 || index}
+                style={[gutters.marginRight_SMALL]}
+              >
                 <Button
                   buttonStyle={[
                     isSelected ? borders.primary400 : borders.gray100,
@@ -312,11 +342,7 @@ const FilterSheetContent = ({
                     fonts.size_SM_BeVietnamProRegular,
                   ]}
                   onPress={() =>
-                    dispatch(
-                      updateMovieFilters({
-                        country: item.iso_3166_1 || "",
-                      })
-                    )
+                    dispatch(updateCountryFilter(item.iso_3166_1 as string))
                   }
                   title={item.english_name}
                 />
@@ -324,7 +350,6 @@ const FilterSheetContent = ({
             );
           }}
           showsHorizontalScrollIndicator={false}
-          style={[layout.row, gutters.gap_SMALL]}
         />
       </View>
 
@@ -358,9 +383,7 @@ const FilterSheetContent = ({
                     isSelected ? fonts.primary400 : fonts.gray100,
                     fonts.size_SM_BeVietnamProRegular,
                   ]}
-                  onPress={() =>
-                    dispatch(updateMovieFilters({ genres: movGenre }))
-                  }
+                  onPress={() => dispatch(updateGenresFilter(movGenre))}
                   title={movGenre.name}
                 />
               </View>
