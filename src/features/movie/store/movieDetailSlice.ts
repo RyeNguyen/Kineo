@@ -2,18 +2,18 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 
 import { StateStatus } from "@/config";
-import type { MovieDetail } from "../models/movie.model";
+import type { MovieDetail, MovieVideo } from "../models/movie.model";
 import type { defaultStoreData } from "@/shared";
 
 export interface MovieDetailWithMetadata extends MovieDetail {
-  trailerKeys: string[];
+  videos: MovieVideo[];
 }
 
 export interface MovieDetailState {
   browsingHistory: {
     [key: string]: MovieDetailWithMetadata;
   };
-  currentMovie: defaultStoreData<MovieDetail | null>;
+  currentMovie: defaultStoreData<MovieDetailWithMetadata | null>;
 }
 
 const initialState: MovieDetailState = {

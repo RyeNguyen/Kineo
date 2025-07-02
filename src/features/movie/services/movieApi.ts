@@ -58,7 +58,6 @@ export const getGenresApi = async (movieType: string): Promise<unknown> => {
 };
 
 export const getMovieDetailApi = async (movieId: number): Promise<unknown> => {
-  console.log("🚀 ~ getMovieDetailApi ~ movieId:", movieId);
   try {
     const response = await api.get(
       interpolateString(MovieEndPoint.MOVIE_DETAIL, { movieId })

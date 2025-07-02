@@ -75,6 +75,7 @@
     "profile": "Profile"
   },
   "detail": {
-    "overview": "Overview"
+    "overview": "Overview",
+    "videos": "Videos"
   }
 }

@@ -1,9 +1,14 @@
 import type { Paths } from "@/navigation/paths";
 import { SafeScreen } from "@/shared/components/molecules";
-import { COMMON_NUMBERS, DEVICE_SIZE, ICONS } from "@/shared/constant";
+import {
+  COMMON_NUMBERS,
+  DEVICE_SIZE,
+  ICONS,
+  VideoStatus,
+} from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
 import type { RootScreenProps } from "@/types";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,8 +19,9 @@ import Config from "react-native-config";
 import { moderateScale, verticalScale } from "@/shared";
 import { getYear } from "@/shared/utils/dateHelper";
 import { Button, IconByVariant } from "@/shared/components/atoms";
-import type { MovieGenre } from "../models/movie.model";
+import type { MovieGenre, MovieVideo } from "../models/movie.model";
 import { t } from "i18next";
+import { FlashList } from "@shopify/flash-list";
 
 const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
 const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
@@ -29,11 +35,15 @@ const MovieDetailScreen = ({
   const { backgrounds, borders, fonts, gutters, layout } = useTheme();
 
   const dispatch = useDispatch();
-  const { currentMovie } = useSelector(
+  const { browsingHistory, currentMovie } = useSelector(
     (state: { movieDetail: MovieDetailState }) => state.movieDetail
   );
   const { data } = currentMovie;
   console.log("🚀 ~ currentMovie:", currentMovie);
+
+  const [progress, setProgress] = useState<number>(0);
+
+  const playerRef = useRef<typeof YoutubeIframe>(null);
 
   const moviePoster = useMemo(() => {
     if (!data || !data.poster_path) {
@@ -54,106 +64,186 @@ const MovieDetailScreen = ({
     dispatch(getMovieDetail({ movieId }));
   }, [dispatch, movieId]);
 
+  const onStateChange = useCallback(async (state: string) => {
+    if (state === VideoStatus.ENDED) {
+      setProgress(0);
+      playerRef.current?.seekTo(0, true);
+    }
+  }, []);
+
   return (
-    <SafeScreen style={[backgrounds.background800, gutters.gap_LARGE]}>
-      <View>
-        <YoutubeIframe
-          height={VIDEO_HEIGHT}
-          initialPlayerParams={{
-            controls: false,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-          }}
-          // ref={playerRef}
-          mute={true}
-          // onChangeState={onStateChange}
-          play={true}
-          videoId={trailerKey}
-          width={VIDEO_WIDTH}
-        />
+    <SafeScreen style={[backgrounds.background800]}>
+      <ScrollView>
+        <View style={[gutters.marginBottom_LARGE]}>
+          <YoutubeIframe
+            height={VIDEO_HEIGHT}
+            initialPlayerParams={{
+              controls: false,
+              modestbranding: 1,
+              rel: 0,
+              showinfo: 0,
+            }}
+            mute={true}
+            onChangeState={onStateChange}
+            play={true}
+            ref={playerRef}
+            videoId={trailerKey}
+            width={VIDEO_WIDTH}
+          />
+
+          <View
+            style={[
+              layout.row,
+              layout.itemsStart,
+              gutters.gap_MEDIUM,
+              gutters.paddingHorizontal_MEDIUM,
+            ]}
+          >
+            <FastImage
+              resizeMode={FastImage.resizeMode.cover}
+              source={{
+                priority: FastImage.priority.high,
+                uri: moviePoster || "",
+              }}
+              style={[borders.rounded_8, styles.moviePoster]}
+            />
+
+            <View style={[layout.flexShrink_1, gutters.gap_XSMALL]}>
+              <Text style={[fonts.white, fonts.size_LG_BeVietnamProBold]}>
+                {movieTitle}
+              </Text>
+
+              <View style={[layout.row, gutters.gap_XSMALL]}>
+                <IconByVariant path={ICONS.iconStarActive} />
+                <Text
+                  style={[
+                    layout.itemsCenter,
+                    fonts.white,
+                    fonts.size_SM_BeVietnamProSemiBold,
+                  ]}
+                >
+                  {data?.vote_average}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <ScrollView
+            contentContainerStyle={[
+              gutters.gap_XSMALL,
+              gutters.paddingHorizontal_MEDIUM,
+            ]}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
+            {(data?.genres || []).map((genre: MovieGenre) => (
+              <Button isSecondary key={genre.id} title={genre.name} />
+            ))}
+          </ScrollView>
+        </View>
 
         <View
           style={[
-            layout.row,
-            layout.itemsStart,
-            gutters.gap_MEDIUM,
             gutters.paddingHorizontal_MEDIUM,
+            gutters.marginBottom_LARGE,
+            gutters.gap_SMALL,
           ]}
         >
-          <FastImage
-            resizeMode={FastImage.resizeMode.cover}
-            source={{
-              priority: FastImage.priority.high,
-              uri: moviePoster || "",
-            }}
-            style={[borders.rounded_8, styles.moviePoster]}
-          />
-
-          <View style={[layout.flexShrink_1, gutters.gap_XSMALL]}>
-            <Text style={[fonts.white, fonts.size_LG_BeVietnamProBold]}>
-              {movieTitle}
+          <View style={[gutters.gap_TINY]}>
+            <Text
+              style={[
+                layout.lineHeightMD,
+                fonts.size_SM_BeVietnamProSemiBold,
+                fonts.white,
+              ]}
+            >
+              {t("detail:overview")}
             </Text>
-
-            <View style={[layout.row, gutters.gap_XSMALL]}>
-              <IconByVariant path={ICONS.iconStarActive} />
-              <Text
-                style={[
-                  layout.itemsCenter,
-                  fonts.white,
-                  fonts.size_SM_BeVietnamProSemiBold,
-                ]}
-              >
-                {data?.vote_average}
-              </Text>
-            </View>
+            <View
+              style={[
+                backgrounds.white,
+                borders.rounded_16,
+                styles.titleIndicator,
+              ]}
+            />
           </View>
-        </View>
 
-        <ScrollView
-          contentContainerStyle={[
-            gutters.gap_XSMALL,
-            gutters.paddingHorizontal_MEDIUM,
-          ]}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {(data?.genres || []).map((genre: MovieGenre) => (
-            <Button isSecondary key={genre.id} title={genre.name} />
-          ))}
-        </ScrollView>
-      </View>
-
-      <View style={[gutters.paddingHorizontal_MEDIUM, gutters.gap_SMALL]}>
-        <View style={[gutters.gap_TINY]}>
           <Text
             style={[
-              layout.lineHeightMD,
-              fonts.size_SM_BeVietnamProSemiBold,
               fonts.white,
+              fonts.size_SM_BeVietnamProRegular,
+              layout.lineHeightMD,
             ]}
           >
-            {t("detail:overview")}
+            {data?.overview}
           </Text>
-          <View
-            style={[
-              backgrounds.white,
-              borders.rounded_16,
-              styles.titleIndicator,
-            ]}
-          />
         </View>
 
-        <Text
-          style={[
-            fonts.white,
-            fonts.size_SM_BeVietnamProRegular,
-            layout.lineHeightMD,
-          ]}
-        >
-          {data?.overview}
-        </Text>
-      </View>
+        <View style={[gutters.paddingHorizontal_MEDIUM, gutters.gap_SMALL]}>
+          <View style={[gutters.gap_TINY]}>
+            <Text
+              style={[
+                layout.lineHeightMD,
+                fonts.size_SM_BeVietnamProSemiBold,
+                fonts.white,
+              ]}
+            >
+              {t("detail:videos")}
+            </Text>
+            <View
+              style={[
+                backgrounds.white,
+                borders.rounded_16,
+                styles.titleIndicator,
+              ]}
+            />
+          </View>
+
+          <View style={[gutters.gap_SMALL]}>
+            {(data?.videos || []).map((video: MovieVideo) => {
+              return (
+                <YoutubeIframe
+                  height={VIDEO_HEIGHT}
+                  initialPlayerParams={{
+                    controls: false,
+                    modestbranding: 1,
+                    rel: 0,
+                    showinfo: 0,
+                  }}
+                  mute={true}
+                  play={false}
+                  videoId={video.key}
+                  width={VIDEO_WIDTH}
+                />
+              );
+            })}
+          </View>
+
+          {/* <FlashList
+          data={data?.videos || []}
+          keyExtractor={(item: MovieVideo, index: number) =>
+            item.id?.toString() || index.toString()
+          }
+          renderItem={({ item }: { item: MovieVideo }) => {
+            return (
+              <YoutubeIframe
+                height={VIDEO_HEIGHT}
+                initialPlayerParams={{
+                  controls: false,
+                  modestbranding: 1,
+                  rel: 0,
+                  showinfo: 0,
+                }}
+                mute={true}
+                play={false}
+                videoId={item.key}
+                width={VIDEO_WIDTH}
+              />
+            );
+          }}
+        /> */}
+        </View>
+      </ScrollView>
     </SafeScreen>
   );
 };

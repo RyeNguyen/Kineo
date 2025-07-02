@@ -1,4 +1,8 @@
-import type { MovieDetail, MovieVideoResponse } from "./../models/movie.model";
+import type {
+  MovieDetail,
+  MovieVideo,
+  MovieVideoResponse,
+} from "./../models/movie.model";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { t } from "i18next";
 
@@ -6,7 +10,7 @@ import { put, takeLatest } from "redux-saga/effects";
 
 import { callApiWithNetworkCheck } from "@/shared";
 
-import type { MovieState, MovieWithMetadata } from "./movieSlice";
+import type { MovieState } from "./movieSlice";
 import {
   getMovieDetail,
   getMovieDetailFailed,
@@ -18,7 +22,7 @@ const getMovieState = (state: { movie: MovieState }) => state.movie;
 
 function* getMovieTrailersRequest(
   movieId: number
-): Generator<unknown, string[], unknown> {
+): Generator<unknown, MovieVideo[], unknown> {
   try {
     // const { filter } = (yield select(getMovieState)) as unknown as MovieState;
     // const { type } = filter;
@@ -30,11 +34,9 @@ function* getMovieTrailersRequest(
       endpoint
     )) as MovieVideoResponse;
 
-    const trailers: string[] = (videosResponse.results || [])
-      .filter((video) => video.site === "YouTube")
-      .map((trailer) => {
-        return trailer.key as string;
-      });
+    const trailers: MovieVideo[] = (videosResponse.results || []).filter(
+      (video) => video.site === "YouTube"
+    );
 
     return trailers;
   } catch (error) {
@@ -53,12 +55,12 @@ function* getMovieDetailRequest(
       action.payload.movieId
     )) as MovieDetail;
 
-    const trailerKeys: string[] = (yield callApiWithNetworkCheck(
+    const videos: MovieVideo[] = (yield callApiWithNetworkCheck(
       getMovieTrailersRequest,
       response.id
-    )) as string[];
+    )) as MovieVideo[];
 
-    yield put(getMovieDetailSuccess({ trailerKeys, ...response }));
+    yield put(getMovieDetailSuccess({ videos, ...response }));
   } catch (error: unknown) {
     const errorMessage =
       error instanceof Error ? error.message : t("common:error.unknown_error");
