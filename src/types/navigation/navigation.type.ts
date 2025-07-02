@@ -7,7 +7,13 @@ export type RootStackParamList = {
   [Paths.Feed]: undefined;
   [Paths.Login]: undefined;
   [Paths.Main]: undefined;
+  [Paths.MovieDetail]: {
+    movieId: number;
+    trailerKey: string;
+  };
+  [Paths.Profile]: undefined;
   [Paths.Register]: undefined;
+  [Paths.Search]: undefined;
   [Paths.SelectCountry]: undefined;
   [Paths.Startup]: undefined;
 };

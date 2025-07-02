@@ -56,3 +56,17 @@ export const getGenresApi = async (movieType: string): Promise<unknown> => {
     console.log(error);
   }
 };
+
+export const getMovieDetailApi = async (movieId: number): Promise<unknown> => {
+  console.log("🚀 ~ getMovieDetailApi ~ movieId:", movieId);
+  try {
+    const response = await api.get(
+      interpolateString(MovieEndPoint.MOVIE_DETAIL, { movieId })
+    );
+
+    return response.data;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(error);
+  }
+};

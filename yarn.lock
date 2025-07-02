@@ -1860,43 +1860,53 @@
     "invariant" "^2.2.4"
     "nullthrows" "^1.1.1"
 
-"@react-navigation/core@^7.4.0":
-  "integrity" "sha512-URiDluFl7cLA7GtOAsEvRqPmEMlSSXadqQ3wi9+Dl43dNRMqnoF76WQ9BCXeUPLydJq4yVte9XeMPyD6a0lY1g=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/core/-/core-7.4.0.tgz"
-  "version" "7.4.0"
+"@react-navigation/bottom-tabs@^7.4.2":
+  "integrity" "sha512-jyBux5l3qqEucY5M/ZWxVvfA8TQu7DVl2gK+xB6iKqRUfLf7dSumyVxc7HemDwGFoz3Ug8dVZFvSMEs+mfrieQ=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/bottom-tabs/-/bottom-tabs-7.4.2.tgz"
+  "version" "7.4.2"
   dependencies:
-    "@react-navigation/routers" "^7.2.0"
-    "escape-string-regexp" "^4.0.0"
-    "nanoid" "3.3.8"
-    "query-string" "^7.1.3"
-    "react-is" "^18.2.0"
-    "use-latest-callback" "^0.2.1"
-    "use-sync-external-store" "^1.2.2"
-
-"@react-navigation/elements@^2.2.6":
-  "integrity" "sha512-UPeaCcEDSDRaxjG+qEHbur6jmNW/f9QNCyPsUt6NMgPEdbB5Z8K8oSx2swIaiCnvUbs/K5G3MuWkqQxGj8QXXA=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/elements/-/elements-2.2.6.tgz"
-  "version" "2.2.6"
-  dependencies:
+    "@react-navigation/elements" "^2.5.2"
     "color" "^4.2.3"
 
-"@react-navigation/native@^7.0.15":
-  "integrity" "sha512-72PabJJ8VY3GM8i/DCutFW+ATED96ZV6NH+bW+ry1EL0ZFGHoie96H+KzTqktsrUbBw1rd9KXbEQhBQgo0N7iQ=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/native/-/native-7.0.15.tgz"
-  "version" "7.0.15"
+"@react-navigation/core@^7.12.1":
+  "integrity" "sha512-ir6s25CDkReufi0vQhSIAe+AAHHJN9zTgGlS6iDS1yqbwgl2MiBAZzpaOL1T5llYujie2jF/bODeLz2j4k80zw=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/core/-/core-7.12.1.tgz"
+  "version" "7.12.1"
   dependencies:
-    "@react-navigation/core" "^7.4.0"
+    "@react-navigation/routers" "^7.4.1"
+    "escape-string-regexp" "^4.0.0"
+    "nanoid" "^3.3.11"
+    "query-string" "^7.1.3"
+    "react-is" "^19.1.0"
+    "use-latest-callback" "^0.2.4"
+    "use-sync-external-store" "^1.5.0"
+
+"@react-navigation/elements@^2.2.6", "@react-navigation/elements@^2.5.2":
+  "integrity" "sha512-aGC3ukF5+lXuiF5bK7bJyRuWCE+Tk4MZ3GoQpAb7u7+m0KmsquliDhj4UCWEUU5kUoCeoRAUvv+1lKcYKf+WTQ=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/elements/-/elements-2.5.2.tgz"
+  "version" "2.5.2"
+  dependencies:
+    "color" "^4.2.3"
+    "use-latest-callback" "^0.2.4"
+    "use-sync-external-store" "^1.5.0"
+
+"@react-navigation/native@^7.0.15", "@react-navigation/native@^7.1.14":
+  "integrity" "sha512-X233/CNx41FpshlWe4uEAUN8CNem3ju4t5pnVKcdhDR0cTQT1rK6P0ZwjSylD9zXdnHvJttFjBhKTot6TcvSqA=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/native/-/native-7.1.14.tgz"
+  "version" "7.1.14"
+  dependencies:
+    "@react-navigation/core" "^7.12.1"
     "escape-string-regexp" "^4.0.0"
     "fast-deep-equal" "^3.1.3"
-    "nanoid" "3.3.8"
-    "use-latest-callback" "^0.2.1"
+    "nanoid" "^3.3.11"
+    "use-latest-callback" "^0.2.4"
 
-"@react-navigation/routers@^7.2.0":
-  "integrity" "sha512-lMyib39H4a//u+eiyt162U6TwCfI8zJbjl9ovjKtDddQ4/Vf7b8/OhyimnJH09N2CBfm4pv0gCV6Q0WnZcfaJg=="
-  "resolved" "https://registry.npmjs.org/@react-navigation/routers/-/routers-7.2.0.tgz"
-  "version" "7.2.0"
+"@react-navigation/routers@^7.4.1":
+  "integrity" "sha512-42mZrMzQ0LfKxUb5OHIurYrPYyRsXFLolucILrvm21f0O40Sw0Ufh1bnn/jRqnxZZu7wvpUGIGYM8nS9zVE1Aw=="
+  "resolved" "https://registry.npmjs.org/@react-navigation/routers/-/routers-7.4.1.tgz"
+  "version" "7.4.1"
   dependencies:
-    "nanoid" "3.3.8"
+    "nanoid" "^3.3.11"
 
 "@react-navigation/stack@^7.1.2":
   "integrity" "sha512-uRFec2SeZP7Urgekzake5AbWt1llsfxZdRqd9plOKnUTpSDhRO45d1XidgnB4eguJF4Yvdb8c2Ge3ZB3rvfCxg=="
@@ -6051,10 +6061,10 @@
   "resolved" "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz"
   "version" "2.0.0"
 
-"nanoid@^3.3.1", "nanoid@3.3.8":
-  "integrity" "sha512-WNLf5Sd8oZxOm+TzppcYk8gVOgP+l58xNy58D0nbUnOxOWRWvlcCV4kUF7ltmI6PsrLl/BgKEyS4mqsGChFN0w=="
-  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.8.tgz"
-  "version" "3.3.8"
+"nanoid@^3.3.1", "nanoid@^3.3.11":
+  "integrity" "sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w=="
+  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz"
+  "version" "3.3.11"
 
 "natural-compare-lite@^1.4.0":
   "integrity" "sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g=="
@@ -6644,7 +6654,7 @@
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-17.0.2.tgz"
   "version" "17.0.2"
 
-"react-is@^18.0.0", "react-is@^18.2.0":
+"react-is@^18.0.0":
   "integrity" "sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg=="
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-18.3.1.tgz"
   "version" "18.3.1"
@@ -6653,6 +6663,11 @@
   "integrity" "sha512-H91OHcwjZsbq3ClIDHMzBShc1rotbfACdWENsmEf0IFvZ3FgGPtdHMcsv45bQ1hAbgdfiA8SnxTKfDS+x/8m2g=="
   "resolved" "https://registry.npmjs.org/react-is/-/react-is-19.0.0.tgz"
   "version" "19.0.0"
+
+"react-is@^19.1.0":
+  "integrity" "sha512-Oe56aUPnkHyyDxxkvqtd7KkdQP5uIUfHxd5XTb3wE9d/kRnZLmKbDB0GWk919tdQ+mxxPtG6EAs6RMT6i1qtHg=="
+  "resolved" "https://registry.npmjs.org/react-is/-/react-is-19.1.0.tgz"
+  "version" "19.1.0"
 
 "react-native-config@^1.5.5":
   "integrity" "sha512-dGdLnBU0cd5xL5bF0ROTmHYbsstZnQKOEPfglvZi1vStvAjpld14X25K6mY3KGPTMWAzx6TbjKeq5dR+ILuMMA=="
@@ -7964,15 +7979,15 @@
   dependencies:
     "punycode" "^2.1.0"
 
-"use-latest-callback@^0.2.1":
-  "integrity" "sha512-7vI3fBuyRcP91pazVboc4qu+6ZqM8izPWX9k7cRnT8hbD5svslcknsh3S9BUhaK11OmgTV4oWZZVSeQAiV53SQ=="
-  "resolved" "https://registry.npmjs.org/use-latest-callback/-/use-latest-callback-0.2.3.tgz"
-  "version" "0.2.3"
+"use-latest-callback@^0.2.4":
+  "integrity" "sha512-LS2s2n1usUUnDq4oVh1ca6JFX9uSqUncTfAm44WMg0v6TxL7POUTk1B044NH8TeLkFbNajIsgDHcgNpNzZucdg=="
+  "resolved" "https://registry.npmjs.org/use-latest-callback/-/use-latest-callback-0.2.4.tgz"
+  "version" "0.2.4"
 
-"use-sync-external-store@^1.2.2", "use-sync-external-store@^1.4.0":
-  "integrity" "sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw=="
-  "resolved" "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.4.0.tgz"
-  "version" "1.4.0"
+"use-sync-external-store@^1.4.0", "use-sync-external-store@^1.5.0":
+  "integrity" "sha512-Rb46I4cGGVBmjamjphe8L/UnvJD+uPPtTkNvX5mZgqdbavhI4EbgIWJiIHXJ8bc/i9EQGPRh4DwEURJ552Do0A=="
+  "resolved" "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.5.0.tgz"
+  "version" "1.5.0"
 
 "util-deprecate@^1.0.1":
   "integrity" "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw=="

@@ -14,7 +14,7 @@ const api = axios.create({
   },
   params: {
     api_key: Config.API_KEY,
-    language: "en-US",
+    language: "vi-VN",
     region: "VN",
   },
   timeout: 10_000,

@@ -15,11 +15,15 @@ export const ICONS = {
   iconFilter: "iconFilter",
   iconForward: "iconForward",
   iconMovie: "iconMovie",
+  iconMovieActive: "iconMovieActive",
   iconNextWhite: "iconNextWhite",
   iconPause: "iconPause",
   iconPlay: "iconPlay",
   iconProfile: "iconProfile",
+  iconProfileActive: "iconProfileActive",
   iconSearch: "iconSearch",
+  iconSearchActive: "iconSearchActive",
+  iconStarActive: "iconStarActive",
 };
 
 export const MASCOT_SIZE = {
@@ -38,6 +42,7 @@ export const COMMON_NUMBERS = {
   pollingTime: 500,
   seekingTime: 5,
   startFromYear: 1999,
+  tabBarHeight: 74,
   voteCount: 500,
   youtubeAspectRatio: 16 / 9,
 };

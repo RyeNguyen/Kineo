@@ -65,10 +65,18 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   );
 
   useEffect(() => {
-    if (movies.length === 0) {
+    if (!movies.length) {
       dispatch(getDiscoveredMovies());
     }
-  }, [dispatch, movies.length]);
+
+    if (!genres.data.length) {
+      dispatch(getGenres());
+    }
+
+    if (!countries.data.length) {
+      dispatch(getCountries());
+    }
+  }, [countries.data.length, dispatch, genres.data.length, movies.length]);
 
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: Array<{ index: null | number }> }) => {
@@ -105,19 +113,19 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
   }, [dispatch]);
 
   const handleOpenFilters = useCallback(() => {
-    if (!genres.data.length) {
-      dispatch(getGenres());
-    }
-
-    if (!countries.data.length) {
-      dispatch(getCountries());
-    }
     filterSheetRef.current?.onExpand();
-  }, [countries.data.length, dispatch, genres.data.length]);
+  }, []);
 
   const handleCloseFilters = useCallback(() => {
     filterSheetRef.current?.close();
   }, []);
+
+  const handleNavigateToDetail = useCallback(
+    ({ movieId, trailerKey }: { movieId: number; trailerKey: string }) => {
+      navigation.navigate(Paths.MovieDetail, { movieId, trailerKey });
+    },
+    [navigation]
+  );
 
   const handleClearFilters = useCallback(() => {
     dispatch(clearAllMovieState());
@@ -246,6 +254,7 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
             cardHeight={layoutHeight}
             isPaused={index !== visibleItemIndex}
             movie={item}
+            onNavigateToDetail={handleNavigateToDetail}
           />
         )}
         showsVerticalScrollIndicator={false}

@@ -35,11 +35,19 @@ import FastImage from "react-native-fast-image";
 import { moderateScale, verticalScale } from "@/shared/utils";
 import { Button, GlassmorphicElement, IconByVariant, Loader } from "../atoms";
 import Config from "react-native-config";
+import { MotiView } from "moti";
 
 interface TrailerCardProps {
   cardHeight?: number;
   isPaused: boolean;
   movie: MovieWithMetadata;
+  onNavigateToDetail: ({
+    movieId,
+    trailerKey,
+  }: {
+    movieId: number;
+    trailerKey: string;
+  }) => void;
 }
 
 const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
@@ -49,6 +57,7 @@ const TrailerCard = ({
   cardHeight = DEVICE_SIZE.height,
   isPaused,
   movie,
+  onNavigateToDetail,
 }: TrailerCardProps) => {
   const { backgrounds, borders, colors, fonts, gutters, layout } = useTheme();
 
@@ -111,7 +120,7 @@ const TrailerCard = ({
       if (isPlaying) {
         setAreControlsVisible(false);
       }
-    }, 3000); // 3 seconds
+    }, 2000); // 3 seconds
   }, [isPlaying]);
 
   useEffect(() => {
@@ -278,12 +287,20 @@ const TrailerCard = ({
           StyleSheet.absoluteFillObject,
         ]}
       >
-        {!isPlaying && (
+        {!isPlaying ? (
           <GlassmorphicElement
             extraStyles={[gutters.padding_SMALL, borders.rounded_100]}
           >
             <IconByVariant path={ICONS.iconPlay} />
           </GlassmorphicElement>
+        ) : (
+          <MotiView animate={{ opacity: areControlsVisible ? 1 : 0 }}>
+            <GlassmorphicElement
+              extraStyles={[gutters.padding_SMALL, borders.rounded_100]}
+            >
+              <IconByVariant path={ICONS.iconPause} />
+            </GlassmorphicElement>
+          </MotiView>
         )}
       </Pressable>
 
@@ -291,13 +308,20 @@ const TrailerCard = ({
         style={[
           layout.absolute,
           layout.left0,
-          layout.bottom0,
           layout.right0,
           layout.z10,
-          gutters.padding_MEDIUM,
+          {
+            bottom: -7,
+          },
         ]}
       >
-        <View style={[gutters.gap_MEDIUM, gutters.marginBottom_LARGE]}>
+        <View
+          style={[
+            gutters.gap_MEDIUM,
+            gutters.paddingHorizontal_MEDIUM,
+            gutters.marginBottom_LARGE,
+          ]}
+        >
           <Text style={[fonts.white, fonts.size_LG_BeVietnamProBold]}>
             {movieTitle}
           </Text>
@@ -333,6 +357,12 @@ const TrailerCard = ({
                 />
                 <Button
                   buttonStyle={[layout.flex_1]}
+                  onPress={() =>
+                    onNavigateToDetail({
+                      movieId: movie.id as number,
+                      trailerKey: movie.trailerKey as string,
+                    })
+                  }
                   title={t("feed:see_more")}
                 />
               </View>

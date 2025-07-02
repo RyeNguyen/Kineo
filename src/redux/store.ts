@@ -8,6 +8,7 @@ import userReducer from "@/features/user/store/userSlice";
 import homeReducer from "./home/homeSlice";
 import networkReducer from "../features/network/store/networkSlice";
 import movieReducer from "../features/movie/store/movieSlice";
+import movieDetailReducer from "../features/movie/store/movieDetailSlice";
 import rootSaga from "./rootSaga";
 import { reduxStorage } from "./storage";
 
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   auth: authReducer,
   home: homeReducer,
   movie: movieReducer,
+  movieDetail: movieDetailReducer,
   network: networkReducer, // Not persisted
   user: userReducer,
 }); // Redux Persist Config

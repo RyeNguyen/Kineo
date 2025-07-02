@@ -27,7 +27,7 @@ const colorsLight = {
   primary600: "#5C665A",
 
   // Background
-  background100: "RGBA()",
+  background800: "#161616",
 } as const;
 
 const colorsDark = {
@@ -51,7 +51,7 @@ const colorsDark = {
   primary600: "#5C665A",
 
   // Background
-  background50: "#E8E8E8",
+  background800: "#161616",
 } as const;
 
 const sizes = {

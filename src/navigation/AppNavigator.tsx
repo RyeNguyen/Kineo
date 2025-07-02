@@ -5,7 +5,11 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Paths } from "@/navigation/paths";
 
 import { useTheme } from "@/shared/hook";
-import { CountrySelectScreen, FeedScreen } from "@/features/movie/screens";
+import {
+  CountrySelectScreen,
+  MovieDetailScreen,
+} from "@/features/movie/screens";
+import MainTabNavigator from "./MainTabNavigator";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -14,11 +18,11 @@ export function AppNavigator() {
 
   return (
     <Stack.Navigator
-      initialRouteName={Paths.Feed}
+      initialRouteName={Paths.Main}
       key={variant}
       screenOptions={{ headerShown: false }}
     >
-      <Stack.Screen component={FeedScreen} name={Paths.Feed} />
+      <Stack.Screen component={MainTabNavigator} name={Paths.Main} />
       <Stack.Screen
         component={CountrySelectScreen}
         name={Paths.SelectCountry}
@@ -27,6 +31,7 @@ export function AppNavigator() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen component={MovieDetailScreen} name={Paths.MovieDetail} />
     </Stack.Navigator>
   );
 }
