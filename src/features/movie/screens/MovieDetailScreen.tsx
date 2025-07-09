@@ -9,7 +9,13 @@ import {
 import { useTheme } from "@/shared/hook";
 import type { RootScreenProps } from "@/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 import { useDispatch, useSelector } from "react-redux";
 import type { MovieDetailState } from "../store/movieDetailSlice";
@@ -199,49 +205,52 @@ const MovieDetailScreen = ({
             />
           </View>
 
-          <View style={[gutters.gap_SMALL]}>
-            {(data?.videos || []).map((video: MovieVideo) => {
+          <FlashList
+            data={data?.videos || []}
+            keyExtractor={(item: MovieVideo, index: number) =>
+              item.id?.toString() || index.toString()
+            }
+            renderItem={({
+              index,
+              item,
+            }: {
+              index: number;
+              item: MovieVideo;
+            }) => {
               return (
-                <YoutubeIframe
-                  height={VIDEO_HEIGHT}
-                  initialPlayerParams={{
-                    controls: false,
-                    modestbranding: 1,
-                    rel: 0,
-                    showinfo: 0,
-                  }}
-                  mute={true}
-                  play={false}
-                  videoId={video.key}
-                  width={VIDEO_WIDTH}
-                />
-              );
-            })}
-          </View>
+                <View style={[gutters.gap_MEDIUM, gutters.marginBottom_LARGE]}>
+                  <View
+                    style={[
+                      borders.rounded_16,
+                      layout.hideOverflow,
+                      {
+                        height: VIDEO_HEIGHT,
+                        width: "100%",
+                      },
+                    ]}
+                  >
+                    <ImageBackground
+                      resizeMode="cover"
+                      source={{
+                        uri: `https://img.youtube.com/vi/${item.key}/maxresdefault.jpg`,
+                      }}
+                      style={[layout.flex_1, { height: "100%" }]}
+                    ></ImageBackground>
+                  </View>
 
-          {/* <FlashList
-          data={data?.videos || []}
-          keyExtractor={(item: MovieVideo, index: number) =>
-            item.id?.toString() || index.toString()
-          }
-          renderItem={({ item }: { item: MovieVideo }) => {
-            return (
-              <YoutubeIframe
-                height={VIDEO_HEIGHT}
-                initialPlayerParams={{
-                  controls: false,
-                  modestbranding: 1,
-                  rel: 0,
-                  showinfo: 0,
-                }}
-                mute={true}
-                play={false}
-                videoId={item.key}
-                width={VIDEO_WIDTH}
-              />
-            );
-          }}
-        /> */}
+                  <Text
+                    style={[
+                      fonts.white,
+                      fonts.size_SM_BeVietnamProRegular,
+                      layout.lineHeightMD,
+                    ]}
+                  >
+                    {item.name}
+                  </Text>
+                </View>
+              );
+            }}
+          />
         </View>
       </ScrollView>
     </SafeScreen>
