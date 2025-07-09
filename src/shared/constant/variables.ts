@@ -59,6 +59,19 @@ export const COMMON_COUNTRIES = [
   "United Kingdom",
 ];
 
+export const VIDEO_THUMBNAIL_QUALITIES = [
+  "maxresdefault",
+  "sddefault",
+  "hqdefault",
+  "mqdefault",
+];
+
+export const VIDEO_WIDTH = Math.min(
+  DEVICE_SIZE.width,
+  COMMON_NUMBERS.maxVideoWidth
+);
+export const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
+
 export const ADVANCED_FILTER = {
   comparison: {
     gte: "gte",

@@ -24,3 +24,7 @@ export const ConfigurationEndpoint = {
   COUNTRIES: `/configuration/countries`,
   LANGUAGES: `/configuration/languages`,
 };
+
+export const YouTubeEndPoint = {
+  IMAGE: `https://img.youtube.com/vi/{videoKey}/{videoQuality}.jpg`,
+};

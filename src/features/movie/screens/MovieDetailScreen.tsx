@@ -5,6 +5,7 @@ import {
   DEVICE_SIZE,
   ICONS,
   VideoStatus,
+  YouTubeEndPoint,
 } from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
 import type { RootScreenProps } from "@/types";
@@ -14,6 +15,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
@@ -22,12 +24,14 @@ import type { MovieDetailState } from "../store/movieDetailSlice";
 import { getMovieDetail } from "../store/movieDetailSlice";
 import FastImage from "react-native-fast-image";
 import Config from "react-native-config";
-import { moderateScale, verticalScale } from "@/shared";
+import { formatToDecimal, moderateScale, verticalScale } from "@/shared";
 import { getYear } from "@/shared/utils/dateHelper";
 import { Button, IconByVariant } from "@/shared/components/atoms";
 import type { MovieGenre, MovieVideo } from "../models/movie.model";
 import { t } from "i18next";
 import { FlashList } from "@shopify/flash-list";
+import { interpolateString } from "@/shared/utils/stringHelper";
+import { VideoList } from "@/shared/components/organisms";
 
 const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
 const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
@@ -79,7 +83,11 @@ const MovieDetailScreen = ({
 
   return (
     <SafeScreen style={[backgrounds.background800]}>
-      <ScrollView>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        stickyHeaderIndices={[2]}
+      >
+        {/* Movie Poster and Trailer */}
         <View style={[gutters.marginBottom_LARGE]}>
           <YoutubeIframe
             height={VIDEO_HEIGHT}
@@ -95,6 +103,16 @@ const MovieDetailScreen = ({
             ref={playerRef}
             videoId={trailerKey}
             width={VIDEO_WIDTH}
+          />
+
+          <View
+            style={[
+              layout.z1,
+              layout.absolute,
+              layout.top0,
+              layout.left0,
+              styles.videoContainer,
+            ]}
           />
 
           <View
@@ -128,7 +146,7 @@ const MovieDetailScreen = ({
                     fonts.size_SM_BeVietnamProSemiBold,
                   ]}
                 >
-                  {data?.vote_average}
+                  {formatToDecimal({ num: data?.vote_average || 0 })}
                 </Text>
               </View>
             </View>
@@ -148,10 +166,11 @@ const MovieDetailScreen = ({
           </ScrollView>
         </View>
 
+        {/* Movie Overview */}
         <View
           style={[
             gutters.paddingHorizontal_MEDIUM,
-            gutters.marginBottom_LARGE,
+            gutters.marginBottom_MEDIUM,
             gutters.gap_SMALL,
           ]}
         >
@@ -185,7 +204,16 @@ const MovieDetailScreen = ({
           </Text>
         </View>
 
-        <View style={[gutters.paddingHorizontal_MEDIUM, gutters.gap_SMALL]}>
+        {/* Content Tab */}
+        <View
+          style={[
+            layout.row,
+            backgrounds.background800,
+            gutters.paddingHorizontal_MEDIUM,
+            gutters.paddingVertical_MEDIUM,
+            gutters.gap_SMALL,
+          ]}
+        >
           <View style={[gutters.gap_TINY]}>
             <Text
               style={[
@@ -204,53 +232,10 @@ const MovieDetailScreen = ({
               ]}
             />
           </View>
+        </View>
 
-          <FlashList
-            data={data?.videos || []}
-            keyExtractor={(item: MovieVideo, index: number) =>
-              item.id?.toString() || index.toString()
-            }
-            renderItem={({
-              index,
-              item,
-            }: {
-              index: number;
-              item: MovieVideo;
-            }) => {
-              return (
-                <View style={[gutters.gap_MEDIUM, gutters.marginBottom_LARGE]}>
-                  <View
-                    style={[
-                      borders.rounded_16,
-                      layout.hideOverflow,
-                      {
-                        height: VIDEO_HEIGHT,
-                        width: "100%",
-                      },
-                    ]}
-                  >
-                    <ImageBackground
-                      resizeMode="cover"
-                      source={{
-                        uri: `https://img.youtube.com/vi/${item.key}/maxresdefault.jpg`,
-                      }}
-                      style={[layout.flex_1, { height: "100%" }]}
-                    ></ImageBackground>
-                  </View>
-
-                  <Text
-                    style={[
-                      fonts.white,
-                      fonts.size_SM_BeVietnamProRegular,
-                      layout.lineHeightMD,
-                    ]}
-                  >
-                    {item.name}
-                  </Text>
-                </View>
-              );
-            }}
-          />
+        <View style={[gutters.paddingHorizontal_MEDIUM]}>
+          <VideoList data={data?.videos || []} />
         </View>
       </ScrollView>
     </SafeScreen>
@@ -265,7 +250,11 @@ const styles = StyleSheet.create({
   },
   titleIndicator: {
     height: verticalScale(3),
-    width: "52%",
+    width: moderateScale(28),
+  },
+  videoContainer: {
+    height: VIDEO_HEIGHT,
+    width: VIDEO_WIDTH,
   },
 });
 
