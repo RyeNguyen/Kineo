@@ -10,4 +10,5 @@ export const enum Paths {
   Search = "search",
   SelectCountry = "selectCountry",
   Startup = "startup",
+  Video = "video",
 }

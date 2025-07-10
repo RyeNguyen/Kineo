@@ -8,6 +8,8 @@ import {
   DEVICE_SIZE,
   ICONS,
   StateStatus,
+  VIDEO_HEIGHT,
+  VIDEO_WIDTH,
   VideoStatus,
 } from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
@@ -39,9 +41,11 @@ import { MotiView } from "moti";
 
 interface TrailerCardProps {
   cardHeight?: number;
+  hasDetails?: boolean;
+  hasFullScreen?: boolean;
   isPaused: boolean;
   movie: MovieWithMetadata;
-  onNavigateToDetail: ({
+  onNavigateToDetail?: ({
     movieId,
     trailerKey,
   }: {
@@ -50,14 +54,13 @@ interface TrailerCardProps {
   }) => void;
 }
 
-const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
-const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
-
 const TrailerCard = ({
   cardHeight = DEVICE_SIZE.height,
+  hasDetails = true,
+  hasFullScreen = true,
   isPaused,
   movie,
-  onNavigateToDetail,
+  onNavigateToDetail = undefined,
 }: TrailerCardProps) => {
   const { backgrounds, borders, colors, fonts, gutters, layout } = useTheme();
 
@@ -350,21 +353,26 @@ const TrailerCard = ({
                 {movie.overview}
               </Text>
               <View style={[layout.row, layout.fullWidth, gutters.gap_SMALL]}>
-                <Button
-                  buttonStyle={[layout.flex_1]}
-                  isSecondary
-                  title={t("feed:full_screen")}
-                />
-                <Button
-                  buttonStyle={[layout.flex_1]}
-                  onPress={() =>
-                    onNavigateToDetail({
-                      movieId: movie.id as number,
-                      trailerKey: movie.trailerKey as string,
-                    })
-                  }
-                  title={t("feed:see_more")}
-                />
+                {hasFullScreen && (
+                  <Button
+                    buttonStyle={[layout.flex_1]}
+                    isSecondary
+                    title={t("feed:full_screen")}
+                  />
+                )}
+                {hasDetails && (
+                  <Button
+                    buttonStyle={[layout.flex_1]}
+                    onPress={() =>
+                      onNavigateToDetail &&
+                      onNavigateToDetail({
+                        movieId: movie.id as number,
+                        trailerKey: movie.trailerKey as string,
+                      })
+                    }
+                    title={t("feed:see_more")}
+                  />
+                )}
               </View>
             </View>
           </View>

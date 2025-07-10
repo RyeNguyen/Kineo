@@ -1,5 +1,6 @@
 import type { StackScreenProps } from "@react-navigation/stack";
 import type { Paths } from "@/navigation/paths";
+import type { MovieDetailWithMetadata } from "@/features/movie/store/movieDetailSlice";
 
 export type RootStackParamList = {
   [Paths.Auth]: undefined;
@@ -16,6 +17,10 @@ export type RootStackParamList = {
   [Paths.Search]: undefined;
   [Paths.SelectCountry]: undefined;
   [Paths.Startup]: undefined;
+  [Paths.Video]: {
+    firstVideo?: string;
+    movie: MovieDetailWithMetadata;
+  };
 };
 
 export type RootScreenProps<

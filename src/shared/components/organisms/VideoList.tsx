@@ -4,9 +4,13 @@ import { VideoCard } from "../molecules";
 
 interface VideoListProps {
   data: MovieVideo[];
+  handleNavigateToVideo?: (firstVideo: string) => void;
 }
 
-const VideoList = ({ data }: VideoListProps) => {
+const VideoList = ({
+  data,
+  handleNavigateToVideo = undefined,
+}: VideoListProps) => {
   return (
     <FlashList
       data={data || []}
@@ -16,6 +20,7 @@ const VideoList = ({ data }: VideoListProps) => {
       renderItem={({ index, item }: { index: number; item: MovieVideo }) => {
         return (
           <VideoCard
+            onPress={handleNavigateToVideo}
             videoKey={item.key as string}
             videoName={item.name as string}
           />

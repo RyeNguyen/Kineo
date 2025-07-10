@@ -7,11 +7,16 @@ import { Text, TouchableOpacity } from "react-native";
 import FastImage from "react-native-fast-image";
 
 interface VideoCardProps {
+  onPress?: (firstVideo: string) => void;
   videoKey: string;
   videoName: string;
 }
 
-const VideoCard = ({ videoKey, videoName }: VideoCardProps) => {
+const VideoCard = ({
+  onPress = undefined,
+  videoKey,
+  videoName,
+}: VideoCardProps) => {
   const { borders, fonts, gutters, layout } = useTheme();
 
   const [currentQuality, setCurrentQuality] = useState<string>(
@@ -26,7 +31,10 @@ const VideoCard = ({ videoKey, videoName }: VideoCardProps) => {
   }, [currentQuality]);
 
   return (
-    <TouchableOpacity style={[gutters.gap_SMALL, gutters.marginBottom_LARGE]}>
+    <TouchableOpacity
+      onPress={() => onPress && onPress(videoKey)}
+      style={[gutters.gap_SMALL, gutters.marginBottom_LARGE]}
+    >
       <FastImage
         onError={handleImageError}
         resizeMode={FastImage.resizeMode.cover}

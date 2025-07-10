@@ -1,23 +1,15 @@
-import type { Paths } from "@/navigation/paths";
+import { Paths } from "@/navigation/paths";
 import { SafeScreen } from "@/shared/components/molecules";
 import {
-  COMMON_NUMBERS,
-  DEVICE_SIZE,
   ICONS,
+  VIDEO_HEIGHT,
+  VIDEO_WIDTH,
   VideoStatus,
-  YouTubeEndPoint,
 } from "@/shared/constant";
 import { useTheme } from "@/shared/hook";
 import type { RootScreenProps } from "@/types";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  ImageBackground,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import YoutubeIframe from "react-native-youtube-iframe";
 import { useDispatch, useSelector } from "react-redux";
 import type { MovieDetailState } from "../store/movieDetailSlice";
@@ -27,14 +19,9 @@ import Config from "react-native-config";
 import { formatToDecimal, moderateScale, verticalScale } from "@/shared";
 import { getYear } from "@/shared/utils/dateHelper";
 import { Button, IconByVariant } from "@/shared/components/atoms";
-import type { MovieGenre, MovieVideo } from "../models/movie.model";
+import type { MovieGenre } from "../models/movie.model";
 import { t } from "i18next";
-import { FlashList } from "@shopify/flash-list";
-import { interpolateString } from "@/shared/utils/stringHelper";
 import { VideoList } from "@/shared/components/organisms";
-
-const VIDEO_WIDTH = Math.min(DEVICE_SIZE.width, COMMON_NUMBERS.maxVideoWidth);
-const VIDEO_HEIGHT = VIDEO_WIDTH / COMMON_NUMBERS.youtubeAspectRatio;
 
 const MovieDetailScreen = ({
   navigation,
@@ -49,7 +36,7 @@ const MovieDetailScreen = ({
     (state: { movieDetail: MovieDetailState }) => state.movieDetail
   );
   const { data } = currentMovie;
-  console.log("🚀 ~ currentMovie:", currentMovie);
+  // console.log("🚀 ~ currentMovie:", currentMovie);
 
   const [progress, setProgress] = useState<number>(0);
 
@@ -80,6 +67,19 @@ const MovieDetailScreen = ({
       playerRef.current?.seekTo(0, true);
     }
   }, []);
+
+  const handleNavigateToVideo = useCallback(
+    (firstVideo: string) => {
+      if (!currentMovie.data) {
+        return;
+      }
+      navigation.navigate(Paths.Video, {
+        firstVideo,
+        movie: currentMovie.data,
+      });
+    },
+    [currentMovie, navigation]
+  );
 
   return (
     <SafeScreen style={[backgrounds.background800]}>
@@ -235,7 +235,10 @@ const MovieDetailScreen = ({
         </View>
 
         <View style={[gutters.paddingHorizontal_MEDIUM]}>
-          <VideoList data={data?.videos || []} />
+          <VideoList
+            data={data?.videos || []}
+            handleNavigateToVideo={handleNavigateToVideo}
+          />
         </View>
       </ScrollView>
     </SafeScreen>

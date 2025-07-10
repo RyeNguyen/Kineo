@@ -10,6 +10,7 @@ import {
   MovieDetailScreen,
 } from "@/features/movie/screens";
 import MainTabNavigator from "./MainTabNavigator";
+import VideoScreen from "@/features/movie/screens/VideoScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -31,6 +32,7 @@ export function AppNavigator() {
           presentation: "modal",
         }}
       />
+      <Stack.Screen component={VideoScreen} name={Paths.Video} />
       <Stack.Screen component={MovieDetailScreen} name={Paths.MovieDetail} />
     </Stack.Navigator>
   );
