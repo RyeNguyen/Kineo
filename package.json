@@ -55,6 +55,7 @@
     "react-native-keychain": "^9.2.3",
     "react-native-localize": "^3.4.1",
     "react-native-mmkv": "^3.2.0",
+    "react-native-orientation-locker": "^1.7.0",
     "react-native-reanimated": "^3.17.1",
     "react-native-safe-area-context": "^5.2.0",
     "react-native-screens": "^4.9.1",

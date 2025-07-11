@@ -6,6 +6,9 @@ export type RootStackParamList = {
   [Paths.Auth]: undefined;
   [Paths.Example]: undefined;
   [Paths.Feed]: undefined;
+  [Paths.FullScreenPlayer]: {
+    videoId: string;
+  };
   [Paths.Login]: undefined;
   [Paths.Main]: undefined;
   [Paths.MovieDetail]: {

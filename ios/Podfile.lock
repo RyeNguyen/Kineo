@@ -1277,6 +1277,8 @@ PODS:
     - Yoga
   - react-native-netinfo (11.4.1):
     - React-Core
+  - react-native-orientation-locker (1.7.0):
+    - React-Core
   - react-native-safe-area-context (5.2.0):
     - DoubleConversion
     - glog
@@ -2129,6 +2131,7 @@ DEPENDENCIES:
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-mmkv (from `../node_modules/react-native-mmkv`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
+  - react-native-orientation-locker (from `../node_modules/react-native-orientation-locker`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - "react-native-skia (from `../node_modules/@shopify/react-native-skia`)"
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
@@ -2261,6 +2264,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-mmkv"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
+  react-native-orientation-locker:
+    :path: "../node_modules/react-native-orientation-locker"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-skia:
@@ -2388,6 +2393,7 @@ SPEC CHECKSUMS:
   react-native-config: 3367df9c1f25bb96197007ec531c7087ed4554c3
   react-native-mmkv: 55e8a074ae9cb919609755d7271c16b242c2603f
   react-native-netinfo: f0a9899081c185db1de5bb2fdc1c88c202a059ac
+  react-native-orientation-locker: 5819fd23ca89cbac0d736fb4314745f62716d517
   react-native-safe-area-context: 9c33120e9eac7741a5364cc2d9f74665049b76b3
   react-native-skia: 9b296f8cc7dcd22dd55fb9b56686a8a730a442fe
   react-native-slider: 27263d134d55db948a4706f1e47d0ec88fb354dd

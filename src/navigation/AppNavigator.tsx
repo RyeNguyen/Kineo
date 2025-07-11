@@ -7,6 +7,7 @@ import { Paths } from "@/navigation/paths";
 import { useTheme } from "@/shared/hook";
 import {
   CountrySelectScreen,
+  FullScreenPlayerScreen,
   MovieDetailScreen,
 } from "@/features/movie/screens";
 import MainTabNavigator from "./MainTabNavigator";
@@ -34,6 +35,10 @@ export function AppNavigator() {
       />
       <Stack.Screen component={VideoScreen} name={Paths.Video} />
       <Stack.Screen component={MovieDetailScreen} name={Paths.MovieDetail} />
+      <Stack.Screen
+        component={FullScreenPlayerScreen}
+        name={Paths.FullScreenPlayer}
+      />
     </Stack.Navigator>
   );
 }

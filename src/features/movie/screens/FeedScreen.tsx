@@ -206,60 +206,62 @@ function FeedScreen({ navigation }: RootScreenProps<Paths.Feed>) {
 
   return (
     <SafeScreen onLayout={onLayout} style={[backgrounds.black]}>
-      <FlashList
-        data={movies}
-        estimatedItemSize={DEVICE_SIZE.height}
-        extraData={visibleItemIndex}
-        keyExtractor={(item: MovieWithMetadata, index: number) =>
-          (item.id || index).toString()
-        }
-        ListFooterComponent={
-          movies.length === 0 ? (
-            <View
-              style={[
-                layout.itemsCenter,
-                layout.justifyCenter,
-                { height: layoutHeight },
-              ]}
-            >
-              <Loader size={64} />
-            </View>
-          ) : null
-        }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.8}
-        onRefresh={handleRefresh}
-        onViewableItemsChanged={onViewableItemsChanged}
-        pagingEnabled
-        refreshControl={
-          <RefreshControl
-            colors={[colors.primary400]} // For Android, makes the spinner white
-            onRefresh={handleRefresh}
-            progressBackgroundColor={colors.gray800}
-            refreshing={isRefreshing}
-            tintColor={colors.primary400} // For iOS, makes the spinner white
-          />
-        }
-        refreshing={isRefreshing}
-        // These help with performance
-        removeClippedSubviews={true}
-        renderItem={({
-          index,
-          item,
-        }: {
-          index: number;
-          item: MovieWithMetadata;
-        }) => (
-          <TrailerCard
-            cardHeight={layoutHeight}
-            isPaused={index !== visibleItemIndex}
-            movie={item}
-            onNavigateToDetail={handleNavigateToDetail}
-          />
-        )}
-        showsVerticalScrollIndicator={false}
-        viewabilityConfig={viewabilityConfig}
-      />
+      {layoutHeight > 0 && (
+        <FlashList
+          data={movies}
+          estimatedItemSize={DEVICE_SIZE.height}
+          extraData={visibleItemIndex}
+          keyExtractor={(item: MovieWithMetadata, index: number) =>
+            (item.id || index).toString()
+          }
+          ListFooterComponent={
+            movies.length === 0 ? (
+              <View
+                style={[
+                  layout.itemsCenter,
+                  layout.justifyCenter,
+                  { height: layoutHeight },
+                ]}
+              >
+                <Loader size={64} />
+              </View>
+            ) : null
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.8}
+          onRefresh={handleRefresh}
+          onViewableItemsChanged={onViewableItemsChanged}
+          pagingEnabled
+          refreshControl={
+            <RefreshControl
+              colors={[colors.primary400]} // For Android, makes the spinner white
+              onRefresh={handleRefresh}
+              progressBackgroundColor={colors.gray800}
+              refreshing={isRefreshing}
+              tintColor={colors.primary400} // For iOS, makes the spinner white
+            />
+          }
+          refreshing={isRefreshing}
+          // These help with performance
+          removeClippedSubviews={true}
+          renderItem={({
+            index,
+            item,
+          }: {
+            index: number;
+            item: MovieWithMetadata;
+          }) => (
+            <TrailerCard
+              cardHeight={layoutHeight}
+              isPaused={index !== visibleItemIndex}
+              movie={item}
+              onNavigateToDetail={handleNavigateToDetail}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          viewabilityConfig={viewabilityConfig}
+        />
+      )}
 
       <View
         style={[

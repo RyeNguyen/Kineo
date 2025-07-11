@@ -38,6 +38,9 @@ import { moderateScale, verticalScale } from "@/shared/utils";
 import { Button, GlassmorphicElement, IconByVariant, Loader } from "../atoms";
 import Config from "react-native-config";
 import { MotiView } from "moti";
+import { useNavigation } from "@react-navigation/native";
+import { Paths } from "@/navigation/paths";
+import type { RootScreenProps } from "@/types";
 
 interface TrailerCardProps {
   cardHeight?: number;
@@ -63,6 +66,8 @@ const TrailerCard = ({
   onNavigateToDetail = undefined,
 }: TrailerCardProps) => {
   const { backgrounds, borders, colors, fonts, gutters, layout } = useTheme();
+
+  const navigation = useNavigation<RootScreenProps<Paths.FullScreenPlayer>>();
 
   const { activeTab, pagination } = useSelector(
     (state: { movie: MovieState }) => state.movie
@@ -188,6 +193,15 @@ const TrailerCard = ({
     showControls();
     setIsPlaying((prev) => !prev);
   }, [showControls]);
+
+  const handleFullScreen = () => {
+    if (movie.trailerKey) {
+      setIsPlaying(false);
+      navigation.navigate(Paths.FullScreenPlayer, {
+        videoId: movie.trailerKey,
+      });
+    }
+  };
 
   const seekBackward = useCallback(() => {
     const newTime = Math.max(0, progress - COMMON_NUMBERS.seekingTime); // Prevents going below 0
@@ -357,6 +371,7 @@ const TrailerCard = ({
                   <Button
                     buttonStyle={[layout.flex_1]}
                     isSecondary
+                    onPress={handleFullScreen}
                     title={t("feed:full_screen")}
                   />
                 )}

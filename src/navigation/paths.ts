@@ -2,6 +2,7 @@ export const enum Paths {
   Auth = "auth",
   Example = "example",
   Feed = "feed",
+  FullScreenPlayer = "fullScreenPlayer",
   Login = "login",
   Main = "main",
   MovieDetail = "movieDetail",
